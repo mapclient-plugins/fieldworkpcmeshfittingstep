@@ -23,22 +23,24 @@ class FieldworkPCMeshFittingStep(WorkflowStepMountPoint):
     '''
 
     # maps config keys to fitting function argument names
-    _fitConfigDict = {}
-    _fitConfigDict['Surface Discretisation'] = 'GD'
-    _fitConfigDict['Mahalanobis Weight'] = 'mWeight'
-    _fitConfigDict['Max Func Evaluations'] = 'maxfev'
-    _fitConfigDict['xtol'] = 'xtol'
-    _fitConfigDict['Distance Mode'] = 'gObjType'
-    _fitConfigDict['N Closest Points'] = 'nClosestPoints'
-    _fitConfigDict['KDtree Args'] = 'treeArgs'
+    # _fitConfigDict = {}
+    # _fitConfigDict['Surface Discretisation'] = 'GD'
+    # _fitConfigDict['Mahalanobis Weight'] = 'mWeight'
+    # _fitConfigDict['Max Func Evaluations'] = 'maxfev'
+    # _fitConfigDict['xtol'] = 'xtol'
+    # _fitConfigDict['Distance Mode'] = 'gObjType'
+    # _fitConfigDict['N Closest Points'] = 'nClosestPoints'
+    # _fitConfigDict['KDtree Args'] = 'treeArgs'
 
     _configDefaults = {}
     _configDefaults['identifier'] = ''
+    _configDefaults['Distance Mode'] = 'EPDP'
+    _configDefaults['PCs to Fit'] = '4'
     _configDefaults['Surface Discretisation'] = '[8,8]'
     _configDefaults['Mahalanobis Weight'] = '0.1'
     _configDefaults['Max Func Evaluations'] = '1000'
     _configDefaults['xtol'] = '1e-6'
-    _configDefaults['Distance Mode'] = 'EPDP'
+    _configDefaults['Fit Scale'] = 'False'
     _configDefaults['N Closest Points'] = '1'
     _configDefaults['KDtree Args'] = '{}'
     _configDefaults['GUI'] = 'True'
@@ -62,7 +64,7 @@ class FieldworkPCMeshFittingStep(WorkflowStepMountPoint):
         # principal components (gias.learning.PCA.PrincipalComponents)
         self.addPort(('http://physiomeproject.org/workflow/1.0/rdf-schema#port',
                       'http://physiomeproject.org/workflow/1.0/rdf-schema#uses',
-                      'ju#PrincipalComponents'))
+                      'ju#principalcomponents'))
 
         # initial transform (transform class)
         self.addPort(('http://physiomeproject.org/workflow/1.0/rdf-schema#port',
@@ -112,22 +114,58 @@ class FieldworkPCMeshFittingStep(WorkflowStepMountPoint):
 
         self._widget = None
 
-    def _makeFitter(self):
-        fitkwargs = {}
+    def _fit(self):
+
+        # parse parameters
         if self._config['Distance Mode']=='DPEP':
-            fitkwargs['objMaker'] = fst.GFF.makeObjDPEP
+            objMaker = fst.GFF.makeObjDPEP
         elif self._config['Distance Mode']=='EPDP':
-            fitkwargs['objMaker'] = fst.GFF.makeObjEPDP
-        fitkwargs['SSM'] = self._pc
-        fitkwargs['SSMModes'] = [int(i) for i in self._config['Fit PCs'].split(',')]
-        fitkwargs['GF'] = self._GF
-        fitkwargs['GD'] = [int(i) for i in self._config['Surface Discretisation'].split(',')]
-        fitkwargs['mahalanobisWeight'] = float(self._config['Mahalanobis Weight'])
-        fitkwargs['epIndex'] = None
-        fitkwargs['GFCoordEval'] = None
-        fitkwargs['retFullError'] = True
-        
-        self._fitter = fst._makeMeshFitPCFit(**kwargs)
+            objMaker = fst.GFF.makeObjEPDP
+        fitModes = range(1, self._config['PCs to Fit'])
+        GD = [int(i) for i in self._config['Surface Discretisation'].split(',')]
+        mWeight = float(self._config['Mahalanobis Weight'])
+        xtol = float(self._config['xtol'])
+        fitScale = self._config['Fit Scale']
+        reqNParams = 6 + len(fitModes) + 1
+        if fitScale:
+            reqNParams += 1
+
+        # initialise fitter
+        PCFitter = PCA_fitting.PCFit()
+        PCFitter.setPC(self._pc)
+        PCFitter.xtol = xtol
+        segElements = self._GF.ensemble_field_function.mesh.elements.keys()
+        epI = self._GF.getElementPointIPerTrueElement( GD, segElements )
+        gObj = objMaker(self._GF, self._data, self._dataWeights)
+
+        # get initial transform
+        if self._TFitted is None:
+            x0 = self._TFitted.getT()
+        else:
+            x0 = self._T.getT()
+
+        if len(x0) < reqNParams:
+            x0 = np.hstack([x0, np.zeros(reqNParams - len(x0))])
+        elif len(x0) > reqNParams:
+            x0 = x0[:reqNParams]
+
+        # fit
+        if fitScale:
+            GXOpt, GPOpt = PCFitter.rigidScaleModeNFit(gObj, modes=fitModes[1:],
+                                                       x0=x0, mWeight=mWeight
+                                                       )
+        else:
+            GXOpt, GPOpt = PCFitter.rigidModeNFit(gObj, modes=fitModes[1:],
+                                                  x0=x0, mWeight=mWeight
+                                                  )
+        GF.set_field_parameters(GPOpt.copy().reshape((3,-1,1)))
+        # error calculation
+        self._fitError = obj(GPOpt.copy())
+        self._RMSEFitted = np.sqrt(self._fitError).mean())
+        # transform and GF
+        self._TFitted = transformations.RigidPCModesTransform(GXOpt)
+        self._GFFitted = copy.deepcopy(self._GF)
+        return self._GFFitted, self._TFitted, self._RMSEFitted, self._fitErrors
 
     def execute(self):
         '''
@@ -137,7 +175,7 @@ class FieldworkPCMeshFittingStep(WorkflowStepMountPoint):
         '''
 
         # Put your execute step code here before calling the '_doneExecution' method.
-        if self._config['GUI']=='True':
+        if self._config['GUI']:
             self._widget = MayaviPCMeshFittingViewerWidget(
                                 self.data,
                                 self.GFUnfitted,
@@ -152,29 +190,10 @@ class FieldworkPCMeshFittingStep(WorkflowStepMountPoint):
             self._widget.setModal(True)
             self._setCurrentWidget(self._widget)
 
-        elif self._config['GUI']=='False':
+        else:
             self._fit()
             self.GFFitted = copy.deepcopy(self.GF)
             self._doneExecution()
-
-    def _fit(self, callback=None):
-
-        # generate fitting function
-        self._makeFitter()
-
-        # call fitting functions
-        x0 = self._T0.getT()
-        xOpt, self._RMSEFitted, sdFitted, fitErrors = self._fitter(
-                                                        self._data,
-                                                        x0,
-                                                        self._dataWeights
-                                                        )
-
-        self._GFFitted = copy.deepcopy(self._GF)
-        self._TFitted = transformations.RigidPCModesTransform(xOpt)
-        self._fitErrors = np.sqrt(fitErrros)
-
-        return self._GFFitted, self._TFitted, self._RMSEFitted, self._fitErrors
 
     def _abort(self):
         # self._doneExecution()
@@ -197,10 +216,14 @@ class FieldworkPCMeshFittingStep(WorkflowStepMountPoint):
         ######## TODO  BELOW  #############
 
         if index == 0:
-            self.data = dataIn # ju#pointcoordinates
+            self._data = dataIn # ju#pointcoordinates
         elif index == 1:
-            self.GF = dataIn   # ju#fieldworkmodel
-            self.GFUnfitted = copy.deepcopy(self.GF)
+            self._GF = dataIn   # ju#fieldworkmodel
+            self._GFUnfitted = copy.deepcopy(self.GF)
+        elif index == 2:
+            self._pc = dataIn   # ju#principalcomponents
+        elif index == 3:
+            self._T0 = dataIn
         else:
             self.dataWeights = dataIn # numpyarray1d - dataWeights
 
@@ -210,14 +233,14 @@ class FieldworkPCMeshFittingStep(WorkflowStepMountPoint):
         The index is the index of the port in the port list.  If there is only one
         provides port for this step then the index can be ignored.
         '''
-        if index == 3:
+        if index == 5:
             return self.GFFitted # ju#fieldworkmodel
-        elif index == 4:
-            return self.GFParamsFitted # ju#fieldworkmodelparameters
-        elif index == 5:
-            return self.RMSEFitted # float
+        elif index == 6:
+            return self._TFitted # ju#geometrictransform
+        elif index == 7:
+            return self._RMSEFitted # float
         else:
-            return self.fitErrors # numpyarray1d
+            return self._fitErrors # numpyarray1d
 
     def configure(self):
         '''
@@ -264,21 +287,12 @@ class FieldworkPCMeshFittingStep(WorkflowStepMountPoint):
         conf.beginGroup('config')
         for k in self._config.keys():
             conf.setValue(k, self._config[k])
-        # conf.setValue('identifier', self._config['identifier'])
-        # conf.setValue('GD', self._config['GD'])
-        # conf.setValue('sobelovD', self._config['sobelovD'])
-        # conf.setValue('sobelovW', self._config['sobelovW'])
-        # conf.setValue('normalD', self._config['normalD'])
-        # conf.setValue('normalW', self._config['normalW'])
-        # conf.setValue('itMaxPerIt', self._config['itMaxPerIt'])
-        # conf.setValue('xtol', self._config['xtol'])
-        # conf.setValue('itMax', self._config['itMax'])
-        # conf.setValue('mode', self._config['mode'])
-        # conf.setValue('nClosestPoints', self._config['nClosestPoints'])
-        # conf.setValue('treeArgs', self._config['treeArgs'])
-        # conf.setValue('fitVerbose', self._config['fitVerbose'])
-        # conf.setValue('fixedNodes', self._config['fixedNodes'])
-        # conf.setValue('GUI', self._config['GUI'])
+        
+        if self._config['GUI']:
+            conf.setValue('GUI', 'True')
+        else:
+            conf.setValue('GUI', 'False')    
+
         conf.endGroup()
 
     def deserialize(self, location):
@@ -294,21 +308,12 @@ class FieldworkPCMeshFittingStep(WorkflowStepMountPoint):
 
         for k, v in self._configDefaults.items():
             self._config[k] = conf.value(k, v)
-        # self._config['identifier'] = conf.value('identifier', '')
-        # self._config['GD'] = conf.value('GD', '5.0')
-        # self._config['sobelovD'] = conf.value('sobelovD', '[8,8]')
-        # self._config['sobelovW'] = conf.value('sobelovW', '[1e-6, 1e-6, 1e-6, 1e-6, 2e-6]')
-        # self._config['normalD'] = conf.value('normalD', '8')
-        # self._config['normalW'] = conf.value('normalW', '50.0')
-        # self._config['itMaxPerIt'] = conf.value('itMaxPerIt', '3')
-        # self._config['xtol'] = conf.value('xtol', '1e-6')
-        # self._config['itMax'] = conf.value('itMax', '5')
-        # self._config['mode'] = conf.value('mode', 'DPEP')
-        # self._config['nClosestPoints'] = conf.value('nClosestPoints', '1')
-        # self._config['treeArgs'] = conf.value('treeArgs', '{}')
-        # self._config['fitVerbose'] = conf.value('fitVerbose', 'True')
-        # self._config['fixedNodes'] = conf.value('fixedNodes', 'None')
-        # self._config['GUI'] = conf.value('GUI', 'True')
+
+        if conf.value('GUI')=='True':
+            self._config['GUI'] = True
+        elif conf.value('GUI')=='False':
+            self._config['GUI'] = False
+
         conf.endGroup()
 
         d = ConfigureDialog()
