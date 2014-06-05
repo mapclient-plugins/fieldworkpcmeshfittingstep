@@ -37,19 +37,14 @@ class MayaviPCFittingViewerWidget(QDialog):
     Configure dialog to present the user with the options to configure this step.
     '''
     defaultColor = colours['bone']
-    objectTableHeaderColumns = {'visible':0, 'type':1}
+    objectTableHeaderColumns = {'visible':0}
     backgroundColour = (0.0,0.0,0.0)
-    _dataRenderArgs = {'mode':'point', 'scale_factor':0.1, 'color':(0,1,0)}
+    _dataRenderArgs = {'mode':'point', 'scale_factor':0.5, 'color':(0,1,0)}
     _GFUnfittedRenderArgs = {'color':(1,0,0)}
     _GFFittedRenderArgs = {'color':(1,1,0)}
-    _GFD = [15,15]
+    _GFD = [12,12]
 
-    _fitParamTableRows = ('fit mode','mesh discretisation','sobelov discretisation',\
-                          'sobelov weight','normal discretisation','normal weight',\
-                          'max iterations','max sub-iterations','xtol','kdtree args',\
-                          'n closest points','verbose','fixed nodes','GUI')
-
-    def __init__(self, data, GFUnfitted, config, fitFunc, resetCallback, parent=None):
+    def __init__(self, data, GFUnfitted, config, fitFunc, resetCallback, distModes, parent=None):
         '''
         Constructor
         '''
@@ -67,6 +62,7 @@ class MayaviPCFittingViewerWidget(QDialog):
         self._fitFunc = fitFunc
         self._config = config
         self._resetCallback = resetCallback
+        self._distModes = distModes
 
         # create self._objects
         self._objects = MayaviViewerObjectsContainer()
@@ -75,8 +71,9 @@ class MayaviPCFittingViewerWidget(QDialog):
         self._objects.addObject('GF Fitted', MayaviViewerFieldworkModel('GF Fitted', self._GFFitted, self._GFD, renderArgs=self._GFFittedRenderArgs))
 
         self._makeConnections()
-        self._initialiseObjectTable()
+        self._setupGui()
         self._initialiseSettings()
+        self._initialiseObjectTable()
         self._refresh()
 
         # self.testPlot()
@@ -91,17 +88,44 @@ class MayaviPCFittingViewerWidget(QDialog):
         self._ui.abortButton.clicked.connect(self._abort)
         self._ui.acceptButton.clicked.connect(self._accept)
 
-        # connect up changes to params table
-        self._ui.fitParamsTableWidget.itemChanged.connect(self._fitParamsTableChanged)
+        self._ui.comboBoxDistanceMode.activated.connect(self._saveConfig)
+        self._ui.spinBoxPCsToFit.valueChanged.connect(self._saveConfig)
+        self._ui.spinBoxSurfDisc.valueChanged.connect(self._saveConfig)
+        self._ui.spinBoxMWeight.valueChanged.connect(self._saveConfig)
+        self._ui.spinBoxMaxfev.valueChanged.connect(self._saveConfig)
+        self._ui.lineEditXTol.textChanged.connect(self._saveConfig)
+        self._ui.checkBoxFitSize.clicked.connect(self._saveConfig)
+
+    def _setupGui(self):
+        for m in self._distModes:
+            self._ui.comboBoxDistanceMode.addItem(m)
+
+        self._ui.lineEditXTol.setValidator(QtGui.QDoubleValidator())
+        self._ui.spinBoxPCsToFit.setSingleStep(1)
+        self._ui.spinBoxSurfDisc.setSingleStep(1)
+        self._ui.doubleSpinBoxMWeight.setSingleStep(0.1)
+        self._ui.spinBoxMaxfev.setSingleStep(100)
+        self._ui.spinBoxNCP.setSingleStep(1)
+
+    def _saveConfig(self):
+        config['Distance Mode'] = self._ui.comboBoxDistanceMode.currentText()
+        config['PCs to Fit'] = self._ui.spinBoxPCsToFit.value()
+        config['Surface Discretisation'] = self._ui.spinBoxSurfDisc.value()
+        config['Mahalanobis Weight'] = self._ui.doubleSpinBoxMWeight.value()
+        config['Max Func Evaluations'] = self._ui.spinBoxMaxfev.value()
+        config['xtol'] = self._ui.lineEditXTol.text()
+        config['Fit Scale'] = self._ui.checkBoxFitSize.isChecked()
+        config['N Closest Points'] = self._ui.spinBoxNCP.value()
 
     def _initialiseSettings(self):
-        # set values for the params table
-        for row, param in enumerate(self._fitParamTableRows):
-            self._ui.fitParamsTableWidget.setItem(row, 0, QTableWidgetItem(self._config[param]))
-
-    def _fitParamsTableChanged(self, item):
-        param = self._fitParamTableRows[item.row()]
-        self._config[param] = item.text()
+        self._ui.comboBoxDistMode.setCurrentTextIndex(self._distModes.index(self._config['Distance Mode']))
+        self._ui.lineEditNModes.setValue(self._config['Modes to Fit'])
+        self._ui.lineEditMWeight.setValue(self._config['Mahalanobis Weight'])
+        self._ui.lineEditSurfD.setValue(self._config['Surface Discretisation'])
+        self._ui.lineEditMaxIt.setValue(self._config['Max Iterations'])
+        self._ui.lineEditXTol.setText(self._config['xtol'])
+        self._ui.checkBoxFitSize.setChecked(bool(self._config['Fit Scale']))
+        self._ui.lineEditNCP.setValue(self._config['N Closest Points'])
 
     def _initialiseObjectTable(self):
 
@@ -116,7 +140,6 @@ class MayaviPCFittingViewerWidget(QDialog):
         self._addObjectToTable(2, 'GF Fitted', self._objects.getObject('GF Fitted'), checked=False)
 
         self._ui.tableWidget.resizeColumnToContents(self.objectTableHeaderColumns['visible'])
-        self._ui.tableWidget.resizeColumnToContents(self.objectTableHeaderColumns['type'])
 
     def _addObjectToTable(self, row, name, obj, checked=True):
         typeName = obj.typeName
@@ -129,7 +152,6 @@ class MayaviPCFittingViewerWidget(QDialog):
             tableItem.setCheckState(Qt.Unchecked)
 
         self._ui.tableWidget.setItem(row, self.objectTableHeaderColumns['visible'], tableItem)
-        self._ui.tableWidget.setItem(row, self.objectTableHeaderColumns['type'], QTableWidgetItem(typeName))
 
     def _tableItemClicked(self):
         selectedRow = self._ui.tableWidget.currentRow()
@@ -170,13 +192,13 @@ class MayaviPCFittingViewerWidget(QDialog):
             self._objects.getObject(name).draw(self._scene)
 
     def _fit(self):
-        GFFitted, GFParamsFitted, RMSEFitted, errorsFitted = self._fitFunc(self._fitCallback)
+        GFFitted, GFParamsFitted, RMSEFitted, errorsFitted = self._fitFunc()
         self._GFFitted = copy.deepcopy(GFFitted)
 
         # update error fields
-        self._ui.RMSELineEdit.setText(str(RMSEFitted))
-        self._ui.meanErrorLineEdit.setText(str(errorsFitted.mean()))
-        self._ui.SDLineEdit.setText(str(errorsFitted.std()))
+        self._ui.lineEditRMSE.setText(str(RMSEFitted))
+        self._ui.lineEditMeanError.setText(str(errorsFitted.mean()))
+        self._ui.lineEditSD.setText(str(errorsFitted.std()))
 
         # update fitted GF
         fittedObj = self._objects.getObject('GF Fitted')
@@ -199,9 +221,9 @@ class MayaviPCFittingViewerWidget(QDialog):
         fittedTableItem.setCheckState(Qt.Unchecked)
 
         # clear error fields
-        self._ui.RMSELineEdit.clear()
-        self._ui.meanErrorLineEdit.clear()
-        self._ui.RMSELineEdit.clear()
+        self._ui.lineEditRMSE.clear()
+        self._ui.lineEditMeanError.clear()
+        self._ui.lineEditSD.clear()
 
     def _accept(self):
         self._close()

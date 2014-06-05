@@ -12,7 +12,7 @@ class ConfigureDialog(QtGui.QDialog):
     Configure dialog to present the user with the options to configure this step.
     '''
 
-    def __init__(self, parent=None):
+    def __init__(self, distModes, parent=None):
         '''
         Constructor
         '''
@@ -29,7 +29,21 @@ class ConfigureDialog(QtGui.QDialog):
         # We will use this method to decide whether the identifier is unique.
         self.identifierOccursCount = None
 
+        self._distModes = distModes
+        self._setupDialog()
         self._makeConnections()
+
+    def _setupDialog(self):
+        for m in self._distModes:
+            self._ui.comboBoxDistanceMode.addItem(m)
+
+        self._ui.lineEditXTol.setValidator(QtGui.QDoubleValidator())
+        self._ui.spinBoxPCsToFit.setSingleStep(1)
+        self._ui.spinBoxSurfDisc.setSingleStep(1)
+        self._ui.doubleSpinBoxMWeight.setSingleStep(0.1)
+        self._ui.spinBoxMaxfev.setSingleStep(100)
+        self._ui.spinBoxNCP.setSingleStep(1)
+
 
     def _makeConnections(self):
         self._ui.lineEdit0.textChanged.connect(self.validate)
@@ -75,14 +89,14 @@ class ConfigureDialog(QtGui.QDialog):
         self._previousIdentifier = self._ui.lineEdit0.text()
         config = {}
         config['identifier'] = self._ui.lineEdit0.text()
-        config['Modes to Fit'] = self._ui.lineEditNModes.text()
-        config['Mahalanobis Weight'] = self._ui.lineEditMWeight.text()
-        config['Surface Discretisation'] = self._ui.lineEditSurfD.text()
-        config['Max Iterations'] = self._ui.lineEditMaxIt.text()
+        config['Distance Mode'] = self._ui.comboBoxDistanceMode.currentText()
+        config['PCs to Fit'] = self._ui.spinBoxPCsToFit.value()
+        config['Surface Discretisation'] = self._ui.spinBoxSurfDisc.value()
+        config['Mahalanobis Weight'] = self._ui.doubleSpinBoxMWeight.value()
+        config['Max Func Evaluations'] = self._ui.spinBoxMaxfev.value()
         config['xtol'] = self._ui.lineEditXTol.text()
-        config['Distance Mode'] = self._ui.lineEditDistMode.text()
-        config['N Closest Points'] = self._ui.lineEditNCP.text()
-        config['KDtree Args'] = self._ui.lineEditKDArgs.text()
+        config['Fit Scale'] = self._ui.checkBoxFitSize.isChecked()
+        config['N Closest Points'] = self._ui.spinBoxNCP.value()
         config['GUI'] = self._ui.checkBoxGUI.isChecked()
         return config
 
@@ -94,13 +108,13 @@ class ConfigureDialog(QtGui.QDialog):
         '''
         self._previousIdentifier = config['identifier']
         self._ui.lineEdit0.setText(config['identifier'])
-        self._ui.lineEditNModes.setText(config['Modes to Fit'])
-        self._ui.lineEditMWeight.setText(config['Mahalanobis Weight'])
-        self._ui.lineEditSurfD.setText(config['Surface Discretisation'])
-        self._ui.lineEditMaxIt.setText(config['Max Iterations'])
+        self._ui.comboBoxDistMode.setCurrentTextIndex(self._distModes.index(config['Distance Mode']))
+        self._ui.lineEditNModes.setValue(config['Modes to Fit'])
+        self._ui.lineEditMWeight.setValue(config['Mahalanobis Weight'])
+        self._ui.lineEditSurfD.setValue(config['Surface Discretisation'])
+        self._ui.lineEditMaxIt.setValue(config['Max Iterations'])
         self._ui.lineEditXTol.setText(config['xtol'])
-        self._ui.lineEditDistMode.setText(config['Distance Mode'])
-        self._ui.lineEditNCP.setText(config['N Closest Points'])
-        self._ui.lineEditKDArgs.setText(config['KDtree Args'])
+        self._ui.checkBoxFitSize.setChecked(bool(config['Fit Scale']))
+        self._ui.lineEditNCP.setValue(config['N Closest Points'])
         self._ui.checkBoxGUI.setChecked(bool(config['GUI']))
 

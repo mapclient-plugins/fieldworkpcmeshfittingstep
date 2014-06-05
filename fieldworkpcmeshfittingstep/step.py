@@ -22,15 +22,7 @@ class FieldworkPCMeshFittingStep(WorkflowStepMountPoint):
     for new steps.
     '''
 
-    # maps config keys to fitting function argument names
-    # _fitConfigDict = {}
-    # _fitConfigDict['Surface Discretisation'] = 'GD'
-    # _fitConfigDict['Mahalanobis Weight'] = 'mWeight'
-    # _fitConfigDict['Max Func Evaluations'] = 'maxfev'
-    # _fitConfigDict['xtol'] = 'xtol'
-    # _fitConfigDict['Distance Mode'] = 'gObjType'
-    # _fitConfigDict['N Closest Points'] = 'nClosestPoints'
-    # _fitConfigDict['KDtree Args'] = 'treeArgs'
+    _distModes = ('DPEP', 'EPDP')
 
     _configDefaults = {}
     _configDefaults['identifier'] = ''
@@ -120,8 +112,8 @@ class FieldworkPCMeshFittingStep(WorkflowStepMountPoint):
             objMaker = GFF.makeObjDPEP
         elif self._config['Distance Mode']=='EPDP':
             objMaker = GFF.makeObjEPDP
-        fitModes = range(1, self._config['PCs to Fit'])
-        GD = [int(i) for i in self._config['Surface Discretisation'].split(',')]
+        fitModes = range(1, int(self._config['PCs to Fit']))
+        GD = [int(self._config['Surface Discretisation']),]*2
         mWeight = float(self._config['Mahalanobis Weight'])
         xtol = float(self._config['xtol'])
         fitScale = self._config['Fit Scale']
@@ -251,7 +243,7 @@ class FieldworkPCMeshFittingStep(WorkflowStepMountPoint):
         then set:
             self._configured = True
         '''
-        dlg = ConfigureDialog()
+        dlg = ConfigureDialog(self._distModes)
         dlg.identifierOccursCount = self._identifierOccursCount
         dlg.setConfig(self._config)
         dlg.validate()
@@ -289,6 +281,11 @@ class FieldworkPCMeshFittingStep(WorkflowStepMountPoint):
         for k in self._config.keys():
             conf.setValue(k, self._config[k])
         
+        if self._config['Fit Scale']:
+            conf.setValue('Fit Scale', 'True')
+        else:
+            conf.setValue('Fit Scale', 'False')  
+
         if self._config['GUI']:
             conf.setValue('GUI', 'True')
         else:
@@ -309,6 +306,11 @@ class FieldworkPCMeshFittingStep(WorkflowStepMountPoint):
 
         for k, v in self._configDefaults.items():
             self._config[k] = conf.value(k, v)
+
+        if conf.value('Fit Scale')=='True':
+            self._config['Fit Scale'] = True
+        elif conf.value('Fit Scale')=='False':
+            self._config['Fit Scale'] = False
 
         if conf.value('GUI')=='True':
             self._config['GUI'] = True
