@@ -7,7 +7,7 @@
     <x>0</x>
     <y>0</y>
     <width>418</width>
-    <height>543</height>
+    <height>449</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -30,6 +30,9 @@
       <string/>
      </property>
      <layout class="QFormLayout" name="formLayout">
+      <property name="fieldGrowthPolicy">
+       <enum>QFormLayout::AllNonFixedFieldsGrow</enum>
+      </property>
       <item row="0" column="0">
        <widget class="QLabel" name="label0">
         <property name="text">
@@ -40,145 +43,103 @@
       <item row="0" column="1">
        <widget class="QLineEdit" name="lineEdit0"/>
       </item>
-      <item row="3" column="0">
-       <widget class="QLabel" name="label1">
-        <property name="text">
-         <string>mesh discretisation:  </string>
-        </property>
-       </widget>
-      </item>
-      <item row="3" column="1">
-       <widget class="QLineEdit" name="lineEdit1"/>
-      </item>
-      <item row="4" column="0">
-       <widget class="QLabel" name="label2">
-        <property name="text">
-         <string>sobelov discretisaton:</string>
-        </property>
-       </widget>
-      </item>
-      <item row="4" column="1">
-       <widget class="QLineEdit" name="lineEdit2"/>
-      </item>
-      <item row="5" column="0">
-       <widget class="QLabel" name="label3">
-        <property name="text">
-         <string>sobelov weight:  </string>
-        </property>
-       </widget>
-      </item>
-      <item row="5" column="1">
-       <widget class="QLineEdit" name="lineEdit3"/>
-      </item>
-      <item row="6" column="0">
-       <widget class="QLabel" name="label4">
-        <property name="text">
-         <string>normal discretisation:  </string>
-        </property>
-       </widget>
-      </item>
-      <item row="6" column="1">
-       <widget class="QLineEdit" name="lineEdit4"/>
-      </item>
-      <item row="7" column="0">
-       <widget class="QLabel" name="label5">
-        <property name="text">
-         <string>normal weight:  </string>
-        </property>
-       </widget>
-      </item>
-      <item row="7" column="1">
-       <widget class="QLineEdit" name="lineEdit5"/>
-      </item>
-      <item row="9" column="0">
-       <widget class="QLabel" name="label6">
-        <property name="text">
-         <string>max sub-iterations:  </string>
-        </property>
-       </widget>
-      </item>
-      <item row="9" column="1">
-       <widget class="QLineEdit" name="lineEdit6"/>
-      </item>
-      <item row="10" column="0">
-       <widget class="QLabel" name="label7">
-        <property name="text">
-         <string>xtol:  </string>
-        </property>
-       </widget>
-      </item>
-      <item row="10" column="1">
-       <widget class="QLineEdit" name="lineEdit7"/>
-      </item>
-      <item row="8" column="0">
-       <widget class="QLabel" name="label8">
-        <property name="text">
-         <string>max iterations:  </string>
-        </property>
-       </widget>
-      </item>
-      <item row="8" column="1">
-       <widget class="QLineEdit" name="lineEdit8"/>
-      </item>
       <item row="2" column="0">
        <widget class="QLabel" name="label9">
         <property name="text">
-         <string>fit mode:  </string>
+         <string>Distance Mode:</string>
         </property>
        </widget>
       </item>
       <item row="2" column="1">
-       <widget class="QLineEdit" name="lineEdit9"/>
+       <widget class="QComboBox" name="comboBoxDistanceMode"/>
       </item>
-      <item row="11" column="1">
-       <widget class="QLineEdit" name="lineEdit11"/>
-      </item>
-      <item row="11" column="0">
-       <widget class="QLabel" name="label11">
+      <item row="3" column="0">
+       <widget class="QLabel" name="label1">
         <property name="text">
-         <string>kdtree args:  </string>
+         <string>PCs to Fit:</string>
         </property>
        </widget>
       </item>
-      <item row="12" column="1">
-       <widget class="QLineEdit" name="lineEdit10"/>
+      <item row="4" column="0">
+       <widget class="QLabel" name="label2">
+        <property name="text">
+         <string>Surface Discretisation:</string>
+        </property>
+       </widget>
       </item>
-      <item row="12" column="0">
+      <item row="5" column="0">
+       <widget class="QLabel" name="label3">
+        <property name="text">
+         <string>Mahalanobis Weight:</string>
+        </property>
+       </widget>
+      </item>
+      <item row="6" column="0">
+       <widget class="QLabel" name="label4">
+        <property name="text">
+         <string>Max Func Eval:</string>
+        </property>
+       </widget>
+      </item>
+      <item row="7" column="0">
+       <widget class="QLabel" name="label5">
+        <property name="text">
+         <string>xtol:</string>
+        </property>
+       </widget>
+      </item>
+      <item row="8" column="0">
+       <widget class="QLabel" name="label8">
+        <property name="text">
+         <string>Fit Size:</string>
+        </property>
+       </widget>
+      </item>
+      <item row="9" column="0">
        <widget class="QLabel" name="label10">
         <property name="text">
-         <string>n closest points:  </string>
+         <string>N Closest Points:  </string>
         </property>
        </widget>
       </item>
-      <item row="13" column="1">
-       <widget class="QLineEdit" name="lineEdit12"/>
-      </item>
-      <item row="13" column="0">
-       <widget class="QLabel" name="label12">
-        <property name="text">
-         <string>verbose:  </string>
-        </property>
-       </widget>
-      </item>
-      <item row="14" column="1">
-       <widget class="QLineEdit" name="lineEdit13"/>
-      </item>
-      <item row="14" column="0">
-       <widget class="QLabel" name="label13">
-        <property name="text">
-         <string>fixed nodes:  </string>
-        </property>
-       </widget>
-      </item>
-      <item row="1" column="0">
+      <item row="10" column="0">
        <widget class="QLabel" name="label14">
         <property name="text">
          <string>GUI:</string>
         </property>
        </widget>
       </item>
-      <item row="1" column="1">
-       <widget class="QLineEdit" name="lineEdit14"/>
+      <item row="10" column="1">
+       <widget class="QCheckBox" name="checkBoxGUI">
+        <property name="text">
+         <string/>
+        </property>
+       </widget>
+      </item>
+      <item row="8" column="1">
+       <widget class="QCheckBox" name="checkBox">
+        <property name="text">
+         <string/>
+        </property>
+       </widget>
+      </item>
+      <item row="3" column="1">
+       <widget class="QSpinBox" name="spinBox"/>
+      </item>
+      <item row="4" column="1">
+       <widget class="QSpinBox" name="spinBox_2"/>
+      </item>
+      <item row="5" column="1">
+       <widget class="QDoubleSpinBox" name="doubleSpinBox"/>
+      </item>
+      <item row="6" column="1">
+       <widget class="QSpinBox" name="spinBox_3"/>
+      </item>
+      <item row="9" column="1">
+       <widget class="QSpinBox" name="spinBox_5"/>
+      </item>
+      <item row="7" column="1">
+       <widget class="QLineEdit" name="lineEdit"/>
       </item>
      </layout>
     </widget>

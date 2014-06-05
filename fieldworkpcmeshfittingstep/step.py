@@ -12,7 +12,7 @@ from fieldworkpcmeshfittingstep.configuredialog import ConfigureDialog
 from fieldworkpcmeshfittingstep.mayavipcmeshfittingviewerwidget import MayaviPCMeshFittingViewerWidget
 
 import copy
-from workutils import fieldwork_seg_tools as fst
+from fieldwork.field import geometric_field_fitter as GFF
 from mappluginutils.datatypes import transformations
 import numpy as np
 
@@ -42,7 +42,6 @@ class FieldworkPCMeshFittingStep(WorkflowStepMountPoint):
     _configDefaults['xtol'] = '1e-6'
     _configDefaults['Fit Scale'] = 'False'
     _configDefaults['N Closest Points'] = '1'
-    _configDefaults['KDtree Args'] = '{}'
     _configDefaults['GUI'] = 'True'
 
     def __init__(self, location):
@@ -118,14 +117,15 @@ class FieldworkPCMeshFittingStep(WorkflowStepMountPoint):
 
         # parse parameters
         if self._config['Distance Mode']=='DPEP':
-            objMaker = fst.GFF.makeObjDPEP
+            objMaker = GFF.makeObjDPEP
         elif self._config['Distance Mode']=='EPDP':
-            objMaker = fst.GFF.makeObjEPDP
+            objMaker = GFF.makeObjEPDP
         fitModes = range(1, self._config['PCs to Fit'])
         GD = [int(i) for i in self._config['Surface Discretisation'].split(',')]
         mWeight = float(self._config['Mahalanobis Weight'])
         xtol = float(self._config['xtol'])
         fitScale = self._config['Fit Scale']
+        nClosestPoints = int(self._config['N Closest Points'])
         reqNParams = 6 + len(fitModes) + 1
         if fitScale:
             reqNParams += 1
@@ -136,7 +136,8 @@ class FieldworkPCMeshFittingStep(WorkflowStepMountPoint):
         PCFitter.xtol = xtol
         segElements = self._GF.ensemble_field_function.mesh.elements.keys()
         epI = self._GF.getElementPointIPerTrueElement( GD, segElements )
-        gObj = objMaker(self._GF, self._data, self._dataWeights)
+        gObj = objMaker(self._GF, self._data, self._dataWeights,
+                        nClosestPoints=nClosestPoints)
 
         # get initial transform
         if self._TFitted is None:
