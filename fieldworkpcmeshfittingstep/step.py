@@ -13,6 +13,7 @@ from fieldworkpcmeshfittingstep.mayavipcmeshfittingviewerwidget import MayaviPCM
 
 import copy
 from fieldwork.field import geometric_field_fitter as GFF
+from gias.learning import PCA_fitting
 from mappluginutils.datatypes import transformations
 import numpy as np
 
@@ -170,11 +171,12 @@ class FieldworkPCMeshFittingStep(WorkflowStepMountPoint):
         # Put your execute step code here before calling the '_doneExecution' method.
         if self._config['GUI']:
             self._widget = MayaviPCMeshFittingViewerWidget(
-                                self.data,
-                                self.GFUnfitted,
+                                self._data,
+                                self._GFUnfitted,
                                 self._config,
                                 self._fit,
-                                self._reset)
+                                self._reset,
+                                self._distModes)
             
             # self._widget._ui.registerButton.clicked.connect(self._register)
             self._widget._ui.acceptButton.clicked.connect(self._doneExecution)
@@ -212,7 +214,7 @@ class FieldworkPCMeshFittingStep(WorkflowStepMountPoint):
             self._data = dataIn # ju#pointcoordinates
         elif index == 1:
             self._GF = dataIn   # ju#fieldworkmodel
-            self._GFUnfitted = copy.deepcopy(self.GF)
+            self._GFUnfitted = copy.deepcopy(self._GF)
         elif index == 2:
             self._pc = dataIn   # ju#principalcomponents
         elif index == 3:

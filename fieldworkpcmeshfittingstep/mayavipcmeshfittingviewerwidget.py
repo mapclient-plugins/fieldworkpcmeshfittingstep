@@ -20,7 +20,9 @@ This file is part of MAP Client. (http://launchpad.net/mapclient)
 import os
 os.environ['ETS_TOOLKIT'] = 'qt4'
 
-from PySide.QtGui import QDialog, QFileDialog, QDialogButtonBox, QAbstractItemView, QTableWidgetItem
+from PySide.QtGui import QDialog, QFileDialog, QDialogButtonBox,\
+                         QAbstractItemView, QTableWidgetItem,\
+                         QDoubleValidator
 from PySide.QtCore import Qt
 
 from fieldworkpcmeshfittingstep.ui_mayavifittingviewerwidget import Ui_Dialog
@@ -91,7 +93,7 @@ class MayaviPCMeshFittingViewerWidget(QDialog):
         self._ui.comboBoxDistanceMode.activated.connect(self._saveConfig)
         self._ui.spinBoxPCsToFit.valueChanged.connect(self._saveConfig)
         self._ui.spinBoxSurfDisc.valueChanged.connect(self._saveConfig)
-        self._ui.spinBoxMWeight.valueChanged.connect(self._saveConfig)
+        self._ui.doubleSpinBoxMWeight.valueChanged.connect(self._saveConfig)
         self._ui.spinBoxMaxfev.valueChanged.connect(self._saveConfig)
         self._ui.lineEditXTol.textChanged.connect(self._saveConfig)
         self._ui.checkBoxFitSize.clicked.connect(self._saveConfig)
@@ -100,33 +102,30 @@ class MayaviPCMeshFittingViewerWidget(QDialog):
         for m in self._distModes:
             self._ui.comboBoxDistanceMode.addItem(m)
 
-        self._ui.lineEditXTol.setValidator(QtGui.QDoubleValidator())
+        self._ui.lineEditXTol.setValidator(QDoubleValidator())
         self._ui.spinBoxPCsToFit.setSingleStep(1)
         self._ui.spinBoxSurfDisc.setSingleStep(1)
         self._ui.doubleSpinBoxMWeight.setSingleStep(0.1)
         self._ui.spinBoxMaxfev.setMaximum(10000)
         self._ui.spinBoxMaxfev.setSingleStep(100)
-        self._ui.spinBoxNCP.setSingleStep(1)
 
     def _saveConfig(self):
-        config['Distance Mode'] = self._ui.comboBoxDistanceMode.currentText()
-        config['PCs to Fit'] = self._ui.spinBoxPCsToFit.value()
-        config['Surface Discretisation'] = self._ui.spinBoxSurfDisc.value()
-        config['Mahalanobis Weight'] = self._ui.doubleSpinBoxMWeight.value()
-        config['Max Func Evaluations'] = self._ui.spinBoxMaxfev.value()
-        config['xtol'] = self._ui.lineEditXTol.text()
-        config['Fit Scale'] = self._ui.checkBoxFitSize.isChecked()
-        config['N Closest Points'] = self._ui.spinBoxNCP.value()
+        self._config['Distance Mode'] = self._ui.comboBoxDistanceMode.currentText()
+        self._config['PCs to Fit'] = self._ui.spinBoxPCsToFit.value()
+        self._config['Surface Discretisation'] = self._ui.spinBoxSurfDisc.value()
+        self._config['Mahalanobis Weight'] = self._ui.doubleSpinBoxMWeight.value()
+        self._config['Max Func Evaluations'] = self._ui.spinBoxMaxfev.value()
+        self._config['xtol'] = self._ui.lineEditXTol.text()
+        self._config['Fit Scale'] = self._ui.checkBoxFitSize.isChecked()
 
     def _initialiseSettings(self):
-        elf._ui.comboBoxDistanceMode.setCurrentIndex(self._distModes.index(config['Distance Mode']))
-        self._ui.spinBoxPCsToFit.setValue(int(config['PCs to Fit']))
-        self._ui.doubleSpinBoxMWeight.setValue(float(config['Mahalanobis Weight']))
-        self._ui.spinBoxSurfDisc.setValue(int(config['Surface Discretisation']))
-        self._ui.spinBoxMaxfev.setValue(int(config['Max Func Evaluations']))
-        self._ui.lineEditXTol.setText(config['xtol'])
-        self._ui.checkBoxFitSize.setChecked(bool(config['Fit Scale']))
-        self._ui.spinBoxNCP.setValue(int(config['N Closest Points']))
+        self._ui.comboBoxDistanceMode.setCurrentIndex(self._distModes.index(self._config['Distance Mode']))
+        self._ui.spinBoxPCsToFit.setValue(int(self._config['PCs to Fit']))
+        self._ui.doubleSpinBoxMWeight.setValue(float(self._config['Mahalanobis Weight']))
+        self._ui.spinBoxSurfDisc.setValue(int(self._config['Surface Discretisation']))
+        self._ui.spinBoxMaxfev.setValue(int(self._config['Max Func Evaluations']))
+        self._ui.lineEditXTol.setText(self._config['xtol'])
+        self._ui.checkBoxFitSize.setChecked(bool(self._config['Fit Scale']))
 
     def _initialiseObjectTable(self):
 
