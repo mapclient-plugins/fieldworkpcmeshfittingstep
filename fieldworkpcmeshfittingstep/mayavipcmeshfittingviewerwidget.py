@@ -32,7 +32,7 @@ from mappluginutils.mayaviviewer import MayaviViewerObjectsContainer, MayaviView
 
 import copy
 
-class MayaviPCFittingViewerWidget(QDialog):
+class MayaviPCMeshFittingViewerWidget(QDialog):
     '''
     Configure dialog to present the user with the options to configure this step.
     '''
@@ -104,6 +104,7 @@ class MayaviPCFittingViewerWidget(QDialog):
         self._ui.spinBoxPCsToFit.setSingleStep(1)
         self._ui.spinBoxSurfDisc.setSingleStep(1)
         self._ui.doubleSpinBoxMWeight.setSingleStep(0.1)
+        self._ui.spinBoxMaxfev.setMaximum(10000)
         self._ui.spinBoxMaxfev.setSingleStep(100)
         self._ui.spinBoxNCP.setSingleStep(1)
 
@@ -118,14 +119,14 @@ class MayaviPCFittingViewerWidget(QDialog):
         config['N Closest Points'] = self._ui.spinBoxNCP.value()
 
     def _initialiseSettings(self):
-        self._ui.comboBoxDistMode.setCurrentTextIndex(self._distModes.index(self._config['Distance Mode']))
-        self._ui.lineEditNModes.setValue(self._config['Modes to Fit'])
-        self._ui.lineEditMWeight.setValue(self._config['Mahalanobis Weight'])
-        self._ui.lineEditSurfD.setValue(self._config['Surface Discretisation'])
-        self._ui.lineEditMaxIt.setValue(self._config['Max Iterations'])
-        self._ui.lineEditXTol.setText(self._config['xtol'])
-        self._ui.checkBoxFitSize.setChecked(bool(self._config['Fit Scale']))
-        self._ui.lineEditNCP.setValue(self._config['N Closest Points'])
+        elf._ui.comboBoxDistanceMode.setCurrentIndex(self._distModes.index(config['Distance Mode']))
+        self._ui.spinBoxPCsToFit.setValue(int(config['PCs to Fit']))
+        self._ui.doubleSpinBoxMWeight.setValue(float(config['Mahalanobis Weight']))
+        self._ui.spinBoxSurfDisc.setValue(int(config['Surface Discretisation']))
+        self._ui.spinBoxMaxfev.setValue(int(config['Max Func Evaluations']))
+        self._ui.lineEditXTol.setText(config['xtol'])
+        self._ui.checkBoxFitSize.setChecked(bool(config['Fit Scale']))
+        self._ui.spinBoxNCP.setValue(int(config['N Closest Points']))
 
     def _initialiseObjectTable(self):
 

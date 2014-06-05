@@ -41,6 +41,7 @@ class ConfigureDialog(QtGui.QDialog):
         self._ui.spinBoxPCsToFit.setSingleStep(1)
         self._ui.spinBoxSurfDisc.setSingleStep(1)
         self._ui.doubleSpinBoxMWeight.setSingleStep(0.1)
+        self._ui.spinBoxMaxfev.setMaximum(10000)
         self._ui.spinBoxMaxfev.setSingleStep(100)
         self._ui.spinBoxNCP.setSingleStep(1)
 
@@ -108,13 +109,13 @@ class ConfigureDialog(QtGui.QDialog):
         '''
         self._previousIdentifier = config['identifier']
         self._ui.lineEdit0.setText(config['identifier'])
-        self._ui.comboBoxDistMode.setCurrentTextIndex(self._distModes.index(config['Distance Mode']))
-        self._ui.lineEditNModes.setValue(config['Modes to Fit'])
-        self._ui.lineEditMWeight.setValue(config['Mahalanobis Weight'])
-        self._ui.lineEditSurfD.setValue(config['Surface Discretisation'])
-        self._ui.lineEditMaxIt.setValue(config['Max Iterations'])
+        self._ui.comboBoxDistanceMode.setCurrentIndex(self._distModes.index(config['Distance Mode']))
+        self._ui.spinBoxPCsToFit.setValue(int(config['PCs to Fit']))
+        self._ui.doubleSpinBoxMWeight.setValue(float(config['Mahalanobis Weight']))
+        self._ui.spinBoxSurfDisc.setValue(int(config['Surface Discretisation']))
+        self._ui.spinBoxMaxfev.setValue(int(config['Max Func Evaluations']))
         self._ui.lineEditXTol.setText(config['xtol'])
         self._ui.checkBoxFitSize.setChecked(bool(config['Fit Scale']))
-        self._ui.lineEditNCP.setValue(config['N Closest Points'])
+        self._ui.spinBoxNCP.setValue(int(config['N Closest Points']))
         self._ui.checkBoxGUI.setChecked(bool(config['GUI']))
 

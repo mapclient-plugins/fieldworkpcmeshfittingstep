@@ -28,7 +28,7 @@ class FieldworkPCMeshFittingStep(WorkflowStepMountPoint):
     _configDefaults['identifier'] = ''
     _configDefaults['Distance Mode'] = 'EPDP'
     _configDefaults['PCs to Fit'] = '4'
-    _configDefaults['Surface Discretisation'] = '[8,8]'
+    _configDefaults['Surface Discretisation'] = '10'
     _configDefaults['Mahalanobis Weight'] = '0.1'
     _configDefaults['Max Func Evaluations'] = '1000'
     _configDefaults['xtol'] = '1e-6'
@@ -37,7 +37,7 @@ class FieldworkPCMeshFittingStep(WorkflowStepMountPoint):
     _configDefaults['GUI'] = 'True'
 
     def __init__(self, location):
-        super(FieldworkMeshFittingStep, self).__init__('Fieldwork PC Mesh Fitting', location)
+        super(FieldworkPCMeshFittingStep, self).__init__('Fieldwork PC Mesh Fitting', location)
         self._configured = False # A step cannot be executed until it has been configured.
         self._category = 'Fitting'
         # Add any other initialisation code here:
@@ -154,7 +154,7 @@ class FieldworkPCMeshFittingStep(WorkflowStepMountPoint):
         GF.set_field_parameters(GPOpt.copy().reshape((3,-1,1)))
         # error calculation
         self._fitError = obj(GPOpt.copy())
-        self._RMSEFitted = np.sqrt(self._fitError).mean())
+        self._RMSEFitted = np.sqrt(self._fitError.mean())
         # transform and GF
         self._TFitted = transformations.RigidPCModesTransform(GXOpt)
         self._GFFitted = copy.deepcopy(self._GF)
@@ -319,7 +319,7 @@ class FieldworkPCMeshFittingStep(WorkflowStepMountPoint):
 
         conf.endGroup()
 
-        d = ConfigureDialog()
+        d = ConfigureDialog(self._distModes)
         d.identifierOccursCount = self._identifierOccursCount
         d.setConfig(self._config)
         self._configured = d.validate()
