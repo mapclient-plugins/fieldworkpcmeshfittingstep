@@ -71,15 +71,15 @@ class MayaviPCMeshFittingViewerWidget(QDialog):
         self._objects.addObject('data', MayaviViewerDataPoints('data', self._data, renderArgs=self._dataRenderArgs))
         self._objects.addObject('GF Unfitted', MayaviViewerFieldworkModel('GF Unfitted', self._GFUnfitted, self._GFD, renderArgs=self._GFUnfittedRenderArgs))
         self._objects.addObject('GF Fitted', MayaviViewerFieldworkModel('GF Fitted', self._GFFitted, self._GFD, renderArgs=self._GFFittedRenderArgs))
-
-        self._makeConnections()
+        
         self._setupGui()
         self._initialiseSettings()
+        self._makeConnections()
         self._initialiseObjectTable()
         self._refresh()
 
-        # self.testPlot()
-        # self.drawObjects()
+        # for k, v in self._config.items():
+        #     print k+': ', v
 
     def _makeConnections(self):
         self._ui.tableWidget.itemClicked.connect(self._tableItemClicked)
@@ -111,10 +111,10 @@ class MayaviPCMeshFittingViewerWidget(QDialog):
 
     def _saveConfig(self):
         self._config['Distance Mode'] = self._ui.comboBoxDistanceMode.currentText()
-        self._config['PCs to Fit'] = self._ui.spinBoxPCsToFit.value()
-        self._config['Surface Discretisation'] = self._ui.spinBoxSurfDisc.value()
-        self._config['Mahalanobis Weight'] = self._ui.doubleSpinBoxMWeight.value()
-        self._config['Max Func Evaluations'] = self._ui.spinBoxMaxfev.value()
+        self._config['PCs to Fit'] = str(self._ui.spinBoxPCsToFit.value())
+        self._config['Surface Discretisation'] = str(self._ui.spinBoxSurfDisc.value())
+        self._config['Mahalanobis Weight'] = str(self._ui.doubleSpinBoxMWeight.value())
+        self._config['Max Func Evaluations'] = str(self._ui.spinBoxMaxfev.value())
         self._config['xtol'] = self._ui.lineEditXTol.text()
         self._config['Fit Scale'] = self._ui.checkBoxFitSize.isChecked()
 
@@ -143,8 +143,8 @@ class MayaviPCMeshFittingViewerWidget(QDialog):
 
     def _addObjectToTable(self, row, name, obj, checked=True):
         typeName = obj.typeName
-        print typeName
-        print name
+        # print typeName
+        # print name
         tableItem = QTableWidgetItem(name)
         if checked:
             tableItem.setCheckState(Qt.Checked)
@@ -157,8 +157,8 @@ class MayaviPCMeshFittingViewerWidget(QDialog):
         selectedRow = self._ui.tableWidget.currentRow()
         self.selectedObjectName = self._ui.tableWidget.item(selectedRow, self.objectTableHeaderColumns['visible']).text()
         self._populateScalarsDropDown(self.selectedObjectName)
-        print selectedRow
-        print self.selectedObjectName
+        # print selectedRow
+        # print self.selectedObjectName
 
     def _visibleBoxChanged(self, tableItem):
 
@@ -168,17 +168,17 @@ class MayaviPCMeshFittingViewerWidget(QDialog):
             name = tableItem.text()
             visible = tableItem.checkState().name=='Checked'
 
-            print 'visibleboxchanged name', name
-            print 'visibleboxchanged visible', visible
+            # print 'visibleboxchanged name', name
+            # print 'visibleboxchanged visible', visible
 
             # toggle visibility
             obj = self._objects.getObject(name)
-            print obj.name
+            # print obj.name
             if obj.sceneObject:
-                print 'changing existing visibility'
+                # print 'changing existing visibility'
                 obj.setVisibility(visible)
             else:
-                print 'drawing new'
+                # print 'drawing new'
                 obj.draw(self._scene)
 
     def _getSelectedObjectName(self):
@@ -192,17 +192,17 @@ class MayaviPCMeshFittingViewerWidget(QDialog):
             self._objects.getObject(name).draw(self._scene)
 
     def _fit(self):
-        GFFitted, GFParamsFitted, RMSEFitted, errorsFitted = self._fitFunc()
+        GFFitted, transformFitted, RMSEFitted, errorsFitted = self._fitFunc()
         self._GFFitted = copy.deepcopy(GFFitted)
 
         # update error fields
-        self._ui.lineEditRMSE.setText(str(RMSEFitted))
-        self._ui.lineEditMeanError.setText(str(errorsFitted.mean()))
-        self._ui.lineEditSD.setText(str(errorsFitted.std()))
+        self._ui.RMSELineEdit.setText(str(RMSEFitted))
+        self._ui.meanErrorLineEdit.setText(str(errorsFitted.mean()))
+        self._ui.SDLineEdit.setText(str(errorsFitted.std()))
 
         # update fitted GF
         fittedObj = self._objects.getObject('GF Fitted')
-        fittedObj.updateGeometry(GFParamsFitted, self._scene)
+        fittedObj.updateGeometry(GFFitted.get_field_parameters(), self._scene)
         fittedTableItem = self._ui.tableWidget.item(2, self.objectTableHeaderColumns['visible'])
         fittedTableItem.setCheckState(Qt.Checked)
 
@@ -221,9 +221,9 @@ class MayaviPCMeshFittingViewerWidget(QDialog):
         fittedTableItem.setCheckState(Qt.Unchecked)
 
         # clear error fields
-        self._ui.lineEditRMSE.clear()
-        self._ui.lineEditMeanError.clear()
-        self._ui.lineEditSD.clear()
+        self._ui.RMSELineEdit.clear()
+        self._ui.meanErrorLineEdit.clear()
+        self._ui.SDLineEdit.clear()
 
     def _accept(self):
         self._close()
@@ -248,12 +248,12 @@ class MayaviPCMeshFittingViewerWidget(QDialog):
             name = tableItem.text()
             visible = tableItem.checkState().name=='Checked'
             obj = self._objects.getObject(name)
-            print obj.name
+            # print obj.name
             if obj.sceneObject:
-                print 'changing existing visibility'
+                # print 'changing existing visibility'
                 obj.setVisibility(visible)
             else:
-                print 'drawing new'
+                # print 'drawing new'
                 obj.draw(self._scene)
 
     def _saveScreenShot(self):

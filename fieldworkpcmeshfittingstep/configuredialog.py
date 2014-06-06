@@ -91,13 +91,13 @@ class ConfigureDialog(QtGui.QDialog):
         config = {}
         config['identifier'] = self._ui.lineEdit0.text()
         config['Distance Mode'] = self._ui.comboBoxDistanceMode.currentText()
-        config['PCs to Fit'] = self._ui.spinBoxPCsToFit.value()
-        config['Surface Discretisation'] = self._ui.spinBoxSurfDisc.value()
-        config['Mahalanobis Weight'] = self._ui.doubleSpinBoxMWeight.value()
-        config['Max Func Evaluations'] = self._ui.spinBoxMaxfev.value()
+        config['PCs to Fit'] = str(self._ui.spinBoxPCsToFit.value())
+        config['Surface Discretisation'] = str(self._ui.spinBoxSurfDisc.value())
+        config['Mahalanobis Weight'] = str(self._ui.doubleSpinBoxMWeight.value())
+        config['Max Func Evaluations'] = str(self._ui.spinBoxMaxfev.value())
         config['xtol'] = self._ui.lineEditXTol.text()
         config['Fit Scale'] = self._ui.checkBoxFitSize.isChecked()
-        config['N Closest Points'] = self._ui.spinBoxNCP.value()
+        config['N Closest Points'] = str(self._ui.spinBoxNCP.value())
         config['GUI'] = self._ui.checkBoxGUI.isChecked()
         return config
 

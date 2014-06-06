@@ -113,15 +113,26 @@ class FieldworkPCMeshFittingStep(WorkflowStepMountPoint):
             objMaker = GFF.makeObjDPEP
         elif self._config['Distance Mode']=='EPDP':
             objMaker = GFF.makeObjEPDP
-        fitModes = range(1, int(self._config['PCs to Fit']))
+        fitModes = range(int(self._config['PCs to Fit']))
         GD = [int(self._config['Surface Discretisation']),]*2
         mWeight = float(self._config['Mahalanobis Weight'])
         xtol = float(self._config['xtol'])
         fitScale = self._config['Fit Scale']
         nClosestPoints = int(self._config['N Closest Points'])
-        reqNParams = 6 + len(fitModes) + 1
+        maxfev = int(self._config['Max Func Evaluations'])
+        reqNParams = 6 + len(fitModes)
         if fitScale:
             reqNParams += 1
+
+        print('Fit params:')
+        print('Distance Mode: '+self._config['Distance Mode'])
+        print('PCs to Fit: '+str(fitModes))
+        print('GF: '+str(GD))
+        print('MWeight: '+str(mWeight))
+        print('xtol: '+str(xtol))
+        print('fit scale: '+str(fitScale))
+        print('n closest points: '+str(nClosestPoints))
+        print('maxfev: '+str(maxfev))
 
         # initialise fitter
         PCFitter = PCA_fitting.PCFit()
@@ -129,14 +140,14 @@ class FieldworkPCMeshFittingStep(WorkflowStepMountPoint):
         PCFitter.xtol = xtol
         segElements = self._GF.ensemble_field_function.mesh.elements.keys()
         epI = self._GF.getElementPointIPerTrueElement( GD, segElements )
-        gObj = objMaker(self._GF, self._data, self._dataWeights,
+        gObj = objMaker(self._GF, self._data, GD, self._dataWeights,
                         nClosestPoints=nClosestPoints)
 
         # get initial transform
-        if self._TFitted is None:
+        if self._TFitted is not None:
             x0 = self._TFitted.getT()
         else:
-            x0 = self._T.getT()
+            x0 = self._T0.getT()
 
         if len(x0) < reqNParams:
             x0 = np.hstack([x0, np.zeros(reqNParams - len(x0))])
@@ -146,16 +157,18 @@ class FieldworkPCMeshFittingStep(WorkflowStepMountPoint):
         # fit
         if fitScale:
             GXOpt, GPOpt = PCFitter.rigidScaleModeNFit(gObj, modes=fitModes[1:],
-                                                       x0=x0, mWeight=mWeight
+                                                       x0=x0, mWeight=mWeight,
+                                                       maxfev=maxfev,
                                                        )
         else:
             GXOpt, GPOpt = PCFitter.rigidModeNFit(gObj, modes=fitModes[1:],
-                                                  x0=x0, mWeight=mWeight
+                                                  x0=x0, mWeight=mWeight,
+                                                  maxfev=maxfev,
                                                   )
-        GF.set_field_parameters(GPOpt.copy().reshape((3,-1,1)))
+        self._GF.set_field_parameters(GPOpt.copy().reshape((3,-1,1)))
         # error calculation
-        self._fitError = obj(GPOpt.copy())
-        self._RMSEFitted = np.sqrt(self._fitError.mean())
+        self._fitErrors = gObj(GPOpt.copy())
+        self._RMSEFitted = np.sqrt(self._fitErrors.mean())
         # transform and GF
         self._TFitted = transformations.RigidPCModesTransform(GXOpt)
         self._GFFitted = copy.deepcopy(self._GF)
@@ -199,7 +212,7 @@ class FieldworkPCMeshFittingStep(WorkflowStepMountPoint):
         self._TFitted = None
         self._RMSEFitted = None
         self._fitErrors = None
-        self.GF = copy.deepcopy(self.GFUnfitted)
+        self._GF = copy.deepcopy(self._GFUnfitted)
 
     def setPortData(self, index, dataIn):
         '''
