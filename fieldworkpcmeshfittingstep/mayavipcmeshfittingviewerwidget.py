@@ -30,7 +30,7 @@ from traits.api import HasTraits, Instance, on_trait_change, \
     Int, Dict
 
 from mappluginutils.mayaviviewer import MayaviViewerObjectsContainer, MayaviViewerDataPoints,\
-    MayaviViewerFieldworkModel, colours
+    MayaviViewerFieldworkModel, MayaviViewerLandmark, colours
 
 import copy
 
@@ -44,9 +44,10 @@ class MayaviPCMeshFittingViewerWidget(QDialog):
     _dataRenderArgs = {'mode':'point', 'scale_factor':0.5, 'color':(0,1,0)}
     _GFUnfittedRenderArgs = {'color':(1,0,0)}
     _GFFittedRenderArgs = {'color':(1,1,0)}
+    _landmarkRenderArgs = {'mode':'sphere', 'scale_factor':5.0, 'color':(0,1,0)}
     _GFD = [12,12]
 
-    def __init__(self, data, GFUnfitted, config, fitFunc, resetCallback, distModes, parent=None):
+    def __init__(self, data, GFUnfitted, config, fitFunc, resetCallback, distModes, landmarks=None, parent=None):
         '''
         Constructor
         '''
@@ -65,13 +66,15 @@ class MayaviPCMeshFittingViewerWidget(QDialog):
         self._config = config
         self._resetCallback = resetCallback
         self._distModes = distModes
+        self._landmarks = landmarks
+        if self._landmarks is not None:
+            self._landmarkNames = sorted(self._landmarks.keys())
+            print self._landmarkNames
+        else:
+            self._landmarkNames = []
 
-        # create self._objects
-        self._objects = MayaviViewerObjectsContainer()
-        self._objects.addObject('data', MayaviViewerDataPoints('data', self._data, renderArgs=self._dataRenderArgs))
-        self._objects.addObject('GF Unfitted', MayaviViewerFieldworkModel('GF Unfitted', self._GFUnfitted, self._GFD, renderArgs=self._GFUnfittedRenderArgs))
-        self._objects.addObject('GF Fitted', MayaviViewerFieldworkModel('GF Fitted', self._GFFitted, self._GFD, renderArgs=self._GFFittedRenderArgs))
-        
+
+        self._initViewerObjects()
         self._setupGui()
         self._initialiseSettings()
         self._makeConnections()
@@ -97,6 +100,32 @@ class MayaviPCMeshFittingViewerWidget(QDialog):
         self._ui.spinBoxMaxfev.valueChanged.connect(self._saveConfig)
         self._ui.lineEditXTol.textChanged.connect(self._saveConfig)
         self._ui.checkBoxFitSize.clicked.connect(self._saveConfig)
+        self._ui.lineEditLandmarks.textChanged.connect(self._saveConfig)
+        self._ui.lineEditLandmarkWeights.textChanged.connect(self._saveConfig)
+
+    def _initViewerObjects(self):
+        self._objects = MayaviViewerObjectsContainer()
+        self._objects.addObject('data', 
+                                MayaviViewerDataPoints('data',
+                                                       self._data,
+                                                       renderArgs=self._dataRenderArgs))
+        self._objects.addObject('GF Unfitted',
+                                MayaviViewerFieldworkModel('GF Unfitted',
+                                                           self._GFUnfitted,
+                                                           self._GFD,
+                                                           renderArgs=self._GFUnfittedRenderArgs))
+        self._objects.addObject('GF Fitted',
+                                MayaviViewerFieldworkModel('GF Fitted',
+                                                           self._GFFitted,
+                                                           self._GFD,
+                                                           renderArgs=self._GFFittedRenderArgs))
+        for ln in self._landmarkNames:
+            self._objects.addObject(ln, MayaviViewerLandmark(ln,
+                                                             self._landmarks[ln],
+                                                             renderArgs=self._landmarkRenderArgs
+                                                             )
+                                    )
+
 
     def _setupGui(self):
         for m in self._distModes:
@@ -117,6 +146,8 @@ class MayaviPCMeshFittingViewerWidget(QDialog):
         self._config['Max Func Evaluations'] = str(self._ui.spinBoxMaxfev.value())
         self._config['xtol'] = self._ui.lineEditXTol.text()
         self._config['Fit Scale'] = self._ui.checkBoxFitSize.isChecked()
+        self._config['Landmarks'] = self._ui.lineEditLandmarks.text()
+        self._config['Landmark Weights'] = self._ui.lineEditLandmarkWeights.text()
 
     def _initialiseSettings(self):
         self._ui.comboBoxDistanceMode.setCurrentIndex(self._distModes.index(self._config['Distance Mode']))
@@ -126,6 +157,8 @@ class MayaviPCMeshFittingViewerWidget(QDialog):
         self._ui.spinBoxMaxfev.setValue(int(self._config['Max Func Evaluations']))
         self._ui.lineEditXTol.setText(self._config['xtol'])
         self._ui.checkBoxFitSize.setChecked(bool(self._config['Fit Scale']))
+        self._ui.lineEditLandmarks.setText(self._config['Landmarks'])
+        self._ui.lineEditLandmarkWeights.setText(self._config['Landmark Weights'])
 
     def _initialiseObjectTable(self):
 
@@ -138,9 +171,14 @@ class MayaviPCMeshFittingViewerWidget(QDialog):
         self._addObjectToTable(0, 'data', self._objects.getObject('data'))
         self._addObjectToTable(1, 'GF Unfitted', self._objects.getObject('GF Unfitted'))
         self._addObjectToTable(2, 'GF Fitted', self._objects.getObject('GF Fitted'), checked=False)
+        if self._landmarks is not None:
+            r = 3
+            for ln in self._landmarkNames:
+                self._addObjectToTable(r, ln, self._objects.getObject(ln))
+                r += 1
 
         self._ui.tableWidget.resizeColumnToContents(self.objectTableHeaderColumns['visible'])
-
+        
     def _addObjectToTable(self, row, name, obj, checked=True):
         typeName = obj.typeName
         # print typeName
@@ -156,7 +194,7 @@ class MayaviPCMeshFittingViewerWidget(QDialog):
     def _tableItemClicked(self):
         selectedRow = self._ui.tableWidget.currentRow()
         self.selectedObjectName = self._ui.tableWidget.item(selectedRow, self.objectTableHeaderColumns['visible']).text()
-        self._populateScalarsDropDown(self.selectedObjectName)
+        # self._populateScalarsDropDown(self.selectedObjectName)
         # print selectedRow
         # print self.selectedObjectName
 

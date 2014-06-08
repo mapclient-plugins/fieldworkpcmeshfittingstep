@@ -14,6 +14,7 @@ from fieldworkpcmeshfittingstep.mayavipcmeshfittingviewerwidget import MayaviPCM
 import copy
 from fieldwork.field import geometric_field_fitter as GFF
 from gias.learning import PCA_fitting
+from workutils import meshlandmarks
 from mappluginutils.datatypes import transformations
 import numpy as np
 
@@ -35,6 +36,8 @@ class FieldworkPCMeshFittingStep(WorkflowStepMountPoint):
     _configDefaults['xtol'] = '1e-6'
     _configDefaults['Fit Scale'] = 'False'
     _configDefaults['N Closest Points'] = '1'
+    _configDefaults['Landmarks'] = ''
+    _configDefaults['Landmark Weights'] = ''
     _configDefaults['GUI'] = 'True'
 
     def __init__(self, location):
@@ -67,6 +70,11 @@ class FieldworkPCMeshFittingStep(WorkflowStepMountPoint):
         self.addPort(('http://physiomeproject.org/workflow/1.0/rdf-schema#port',
                       'http://physiomeproject.org/workflow/1.0/rdf-schema#uses',
                       'numpyarray1d'))
+
+        # landmarks (optional)
+        self.addPort(('http://physiomeproject.org/workflow/1.0/rdf-schema#port',
+                      'http://physiomeproject.org/workflow/1.0/rdf-schema#uses',
+                      'ju#landmarks'))
 
         # fitted GF (geometric_field)
         self.addPort(('http://physiomeproject.org/workflow/1.0/rdf-schema#port',
@@ -103,16 +111,90 @@ class FieldworkPCMeshFittingStep(WorkflowStepMountPoint):
         self._TFitted = None
         self._fitErrors = None
         self._fitter = None
+        self._landmarks = None
 
         self._widget = None
+
+    def _parseLandmarkConfig(self):
+        config = self._config['Landmarks']
+        configWeights = self._config['Landmark Weights']
+        if len(config)==0:
+            return None, None
+
+        landmarksMap = []
+        landmarkWeights = []
+        terms = config.strip().split(',')
+        termsWeights = configWeights.strip().split(',')
+        if len(terms)==0:
+            raise ValueError, 'Malformed landmarks config. Terms must be comma separated'
+            # print 'ERROR: Malformed landmarks config. Terms must be comma separated'
+            # return None, None
+
+        if len(terms)!=len(termsWeights):
+            raise ValueError, 'Malformed landmarks config. Mismatch in number of landmarks and weights'
+            # print 'ERROR: Malformed landmarks config. Mismatch in number of landmarks and weights'
+            # return None, None
+
+        for term, termWeight in zip(terms, termsWeights):
+            kv = term.split(':')
+            if len(kv)!=2:
+                raise ValueError, 'Malformed landmarks config. Key and values must be separated by :'
+                # print 'ERROR: Malformed landmarks config. Key and values must be separated by :'
+                # return None, None
+            try:
+                w = float(termWeight)
+            except ValueError:
+                raise ValueError, 'Malformed landmarks config. Bad landmark weight'
+                # print 'ERROR: Malformed landmarks config. Bad landmark weight'
+                # return None, None
+
+            landmarksMap.append([kv[0].strip(), self._landmarks[kv[1].strip()]])
+            landmarkWeights.append(w)
+
+        return landmarksMap, landmarkWeights
+
+    def _makeObj(self, gObjMaker, GD, nClosestPoints):
+        """
+        return an obj with weighting, and one without for rmse calculation
+        """
+        dataObj = gObjMaker(self._GF, self._data, GD, self._dataWeights,
+                            nClosestPoints=nClosestPoints)
+
+        dataObjNoWeights = gObjMaker(self._GF, self._data, GD,
+                                     nClosestPoints=nClosestPoints)
+
+        # handle landmarks
+        ldMap, ldWeights = self._parseLandmarkConfig()
+        if ldMap is None:
+            return dataObj, dataObjNoWeights
+        else:
+            ldObjs = []
+            for ldName, ldTarg in ldMap:
+                evaluator = meshlandmarks.makeLandmarkEvaluator(ldName, self._GF)
+                ldObjs.append(_makeLandmarkObj(ldTarg, evaluator))
+
+            def mainObj(P):
+                gE = dataObj(P)
+                P3 = P.reshape((3,-1))
+                ldE = np.array([f(P3) for f in ldObjs])*ldWeights
+                # print ldE
+                return np.hstack([gE, ldE])
+
+            def mainObjNoWeights(P):
+                gE = dataObjNoWeights(P)
+                P3 = P.reshape((3,-1))
+                ldE = np.array([f(P3) for f in ldObjs])
+                return np.hstack([gE, ldE])
+
+            return mainObj, mainObjNoWeights
 
     def _fit(self):
 
         # parse parameters
         if self._config['Distance Mode']=='DPEP':
-            objMaker = GFF.makeObjDPEP
+            gObjMaker = GFF.makeObjDPEP
         elif self._config['Distance Mode']=='EPDP':
-            objMaker = GFF.makeObjEPDP
+            gObjMaker = GFF.makeObjEPDP
         fitModes = range(int(self._config['PCs to Fit']))
         GD = [int(self._config['Surface Discretisation']),]*2
         mWeight = float(self._config['Mahalanobis Weight'])
@@ -124,6 +206,7 @@ class FieldworkPCMeshFittingStep(WorkflowStepMountPoint):
         if fitScale:
             reqNParams += 1
 
+        print('\nFitting with parameters:')
         print('Fit params:')
         print('Distance Mode: '+self._config['Distance Mode'])
         print('PCs to Fit: '+str(fitModes))
@@ -133,6 +216,8 @@ class FieldworkPCMeshFittingStep(WorkflowStepMountPoint):
         print('fit scale: '+str(fitScale))
         print('n closest points: '+str(nClosestPoints))
         print('maxfev: '+str(maxfev))
+        print('landmarks: '+str(self._config['Landmarks']))
+        print('landmark weights: '+str(self._config['Landmark Weights']))
 
         # initialise fitter
         PCFitter = PCA_fitting.PCFit()
@@ -140,9 +225,8 @@ class FieldworkPCMeshFittingStep(WorkflowStepMountPoint):
         PCFitter.xtol = xtol
         segElements = self._GF.ensemble_field_function.mesh.elements.keys()
         epI = self._GF.getElementPointIPerTrueElement( GD, segElements )
-        gObj = objMaker(self._GF, self._data, GD, self._dataWeights,
-                        nClosestPoints=nClosestPoints)
-
+        obj, objNoWeights = self._makeObj(gObjMaker, GD, nClosestPoints)
+       
         # get initial transform
         if self._TFitted is not None:
             x0 = self._TFitted.getT()
@@ -156,18 +240,18 @@ class FieldworkPCMeshFittingStep(WorkflowStepMountPoint):
 
         # fit
         if fitScale:
-            GXOpt, GPOpt = PCFitter.rigidScaleModeNFit(gObj, modes=fitModes[1:],
+            GXOpt, GPOpt = PCFitter.rigidScaleModeNFit(obj, modes=fitModes[1:],
                                                        x0=x0, mWeight=mWeight,
                                                        maxfev=maxfev,
                                                        )
         else:
-            GXOpt, GPOpt = PCFitter.rigidModeNFit(gObj, modes=fitModes[1:],
+            GXOpt, GPOpt = PCFitter.rigidModeNFit(obj, modes=fitModes[1:],
                                                   x0=x0, mWeight=mWeight,
                                                   maxfev=maxfev,
                                                   )
         self._GF.set_field_parameters(GPOpt.copy().reshape((3,-1,1)))
         # error calculation
-        self._fitErrors = gObj(GPOpt.copy())
+        self._fitErrors = objNoWeights(GPOpt.copy())
         self._RMSEFitted = np.sqrt(self._fitErrors.mean())
         # transform and GF
         self._TFitted = transformations.RigidPCModesTransform(GXOpt)
@@ -189,7 +273,8 @@ class FieldworkPCMeshFittingStep(WorkflowStepMountPoint):
                                 self._config,
                                 self._fit,
                                 self._reset,
-                                self._distModes)
+                                self._distModes,
+                                self._landmarks)
             
             # self._widget._ui.registerButton.clicked.connect(self._register)
             self._widget._ui.acceptButton.clicked.connect(self._doneExecution)
@@ -232,8 +317,10 @@ class FieldworkPCMeshFittingStep(WorkflowStepMountPoint):
             self._pc = dataIn   # ju#principalcomponents
         elif index == 3:
             self._T0 = dataIn
+        elif index == 4:
+            self._dataWeights = dataIn # numpyarray1d - dataWeights
         else:
-            self.dataWeights = dataIn # numpyarray1d - dataWeights
+            self._landmarks = dataIn
 
     def getPortData(self, index):
         '''
@@ -241,11 +328,11 @@ class FieldworkPCMeshFittingStep(WorkflowStepMountPoint):
         The index is the index of the port in the port list.  If there is only one
         provides port for this step then the index can be ignored.
         '''
-        if index == 5:
+        if index == 6:
             return self.GFFitted # ju#fieldworkmodel
-        elif index == 6:
-            return self._TFitted # ju#geometrictransform
         elif index == 7:
+            return self._TFitted # ju#geometrictransform
+        elif index == 8:
             return self._RMSEFitted # float
         else:
             return self._fitErrors # numpyarray1d
@@ -339,3 +426,10 @@ class FieldworkPCMeshFittingStep(WorkflowStepMountPoint):
         d.setConfig(self._config)
         self._configured = d.validate()
 
+
+def _makeLandmarkObj(targ, evaluator):
+    def obj(P):
+        # print targ
+        return ((targ - evaluator(P))**2.0).sum()
+
+    return obj

@@ -2,7 +2,7 @@
 
 # Form implementation generated from reading ui file 'configuredialog.ui'
 #
-# Created: Thu Jun  5 20:55:07 2014
+# Created: Sun Jun  8 14:05:10 2014
 #      by: pyside-uic 0.2.14 running on PySide 1.1.2
 #
 # WARNING! All changes made in this file will be lost!
@@ -12,7 +12,7 @@ from PySide import QtCore, QtGui
 class Ui_Dialog(object):
     def setupUi(self, Dialog):
         Dialog.setObjectName("Dialog")
-        Dialog.resize(418, 449)
+        Dialog.resize(418, 491)
         self.gridLayout = QtGui.QGridLayout(Dialog)
         self.gridLayout.setObjectName("gridLayout")
         self.buttonBox = QtGui.QDialogButtonBox(Dialog)
@@ -61,11 +61,11 @@ class Ui_Dialog(object):
         self.formLayout.setWidget(9, QtGui.QFormLayout.LabelRole, self.label10)
         self.label14 = QtGui.QLabel(self.configGroupBox)
         self.label14.setObjectName("label14")
-        self.formLayout.setWidget(10, QtGui.QFormLayout.LabelRole, self.label14)
+        self.formLayout.setWidget(12, QtGui.QFormLayout.LabelRole, self.label14)
         self.checkBoxGUI = QtGui.QCheckBox(self.configGroupBox)
         self.checkBoxGUI.setText("")
         self.checkBoxGUI.setObjectName("checkBoxGUI")
-        self.formLayout.setWidget(10, QtGui.QFormLayout.FieldRole, self.checkBoxGUI)
+        self.formLayout.setWidget(12, QtGui.QFormLayout.FieldRole, self.checkBoxGUI)
         self.checkBoxFitSize = QtGui.QCheckBox(self.configGroupBox)
         self.checkBoxFitSize.setText("")
         self.checkBoxFitSize.setObjectName("checkBoxFitSize")
@@ -88,6 +88,18 @@ class Ui_Dialog(object):
         self.lineEditXTol = QtGui.QLineEdit(self.configGroupBox)
         self.lineEditXTol.setObjectName("lineEditXTol")
         self.formLayout.setWidget(7, QtGui.QFormLayout.FieldRole, self.lineEditXTol)
+        self.lineEditLandmarks = QtGui.QLineEdit(self.configGroupBox)
+        self.lineEditLandmarks.setObjectName("lineEditLandmarks")
+        self.formLayout.setWidget(10, QtGui.QFormLayout.FieldRole, self.lineEditLandmarks)
+        self.label = QtGui.QLabel(self.configGroupBox)
+        self.label.setObjectName("label")
+        self.formLayout.setWidget(10, QtGui.QFormLayout.LabelRole, self.label)
+        self.label_2 = QtGui.QLabel(self.configGroupBox)
+        self.label_2.setObjectName("label_2")
+        self.formLayout.setWidget(11, QtGui.QFormLayout.LabelRole, self.label_2)
+        self.lineEditLandmarkWeights = QtGui.QLineEdit(self.configGroupBox)
+        self.lineEditLandmarkWeights.setObjectName("lineEditLandmarkWeights")
+        self.formLayout.setWidget(11, QtGui.QFormLayout.FieldRole, self.lineEditLandmarkWeights)
         self.gridLayout.addWidget(self.configGroupBox, 0, 0, 1, 1)
 
         self.retranslateUi(Dialog)
@@ -107,4 +119,6 @@ class Ui_Dialog(object):
         self.label8.setText(QtGui.QApplication.translate("Dialog", "Fit Size:", None, QtGui.QApplication.UnicodeUTF8))
         self.label10.setText(QtGui.QApplication.translate("Dialog", "N Closest Points:  ", None, QtGui.QApplication.UnicodeUTF8))
         self.label14.setText(QtGui.QApplication.translate("Dialog", "GUI:", None, QtGui.QApplication.UnicodeUTF8))
+        self.label.setText(QtGui.QApplication.translate("Dialog", "Landmarks:", None, QtGui.QApplication.UnicodeUTF8))
+        self.label_2.setText(QtGui.QApplication.translate("Dialog", "Landmark Weights:", None, QtGui.QApplication.UnicodeUTF8))
 

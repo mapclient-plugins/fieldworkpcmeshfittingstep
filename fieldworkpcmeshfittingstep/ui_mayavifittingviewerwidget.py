@@ -2,7 +2,7 @@
 
 # Form implementation generated from reading ui file 'mayavifittingviewerwidget.ui'
 #
-# Created: Thu Jun  5 20:55:20 2014
+# Created: Sun Jun  8 14:05:22 2014
 #      by: pyside-uic 0.2.14 running on PySide 1.1.2
 #
 # WARNING! All changes made in this file will be lost!
@@ -12,7 +12,7 @@ from PySide import QtCore, QtGui
 class Ui_Dialog(object):
     def setupUi(self, Dialog):
         Dialog.setObjectName("Dialog")
-        Dialog.resize(914, 781)
+        Dialog.resize(1087, 771)
         sizePolicy = QtGui.QSizePolicy(QtGui.QSizePolicy.Preferred, QtGui.QSizePolicy.Preferred)
         sizePolicy.setHorizontalStretch(0)
         sizePolicy.setVerticalStretch(0)
@@ -64,7 +64,7 @@ class Ui_Dialog(object):
         self.toolBox = QtGui.QToolBox(self.widget1)
         self.toolBox.setObjectName("toolBox")
         self.page_fitting = QtGui.QWidget()
-        self.page_fitting.setGeometry(QtCore.QRect(0, 0, 332, 509))
+        self.page_fitting.setGeometry(QtCore.QRect(0, 0, 319, 542))
         self.page_fitting.setObjectName("page_fitting")
         self.verticalLayout = QtGui.QVBoxLayout(self.page_fitting)
         self.verticalLayout.setObjectName("verticalLayout")
@@ -116,6 +116,18 @@ class Ui_Dialog(object):
         self.lineEditXTol = QtGui.QLineEdit(self.groupBox)
         self.lineEditXTol.setObjectName("lineEditXTol")
         self.formLayout_3.setWidget(5, QtGui.QFormLayout.FieldRole, self.lineEditXTol)
+        self.lineEditLandmarks = QtGui.QLineEdit(self.groupBox)
+        self.lineEditLandmarks.setObjectName("lineEditLandmarks")
+        self.formLayout_3.setWidget(7, QtGui.QFormLayout.FieldRole, self.lineEditLandmarks)
+        self.lineEditLandmarkWeights = QtGui.QLineEdit(self.groupBox)
+        self.lineEditLandmarkWeights.setObjectName("lineEditLandmarkWeights")
+        self.formLayout_3.setWidget(8, QtGui.QFormLayout.FieldRole, self.lineEditLandmarkWeights)
+        self.label_8 = QtGui.QLabel(self.groupBox)
+        self.label_8.setObjectName("label_8")
+        self.formLayout_3.setWidget(7, QtGui.QFormLayout.LabelRole, self.label_8)
+        self.label_9 = QtGui.QLabel(self.groupBox)
+        self.label_9.setObjectName("label_9")
+        self.formLayout_3.setWidget(8, QtGui.QFormLayout.LabelRole, self.label_9)
         self.verticalLayout.addWidget(self.groupBox)
         self.fitButtonsGroup = QtGui.QGridLayout()
         self.fitButtonsGroup.setObjectName("fitButtonsGroup")
@@ -164,7 +176,7 @@ class Ui_Dialog(object):
         self.verticalLayout.addWidget(self.errorGroup)
         self.toolBox.addItem(self.page_fitting, "")
         self.Screenshot = QtGui.QWidget()
-        self.Screenshot.setGeometry(QtCore.QRect(0, 0, 332, 509))
+        self.Screenshot.setGeometry(QtCore.QRect(0, 0, 332, 499))
         self.Screenshot.setObjectName("Screenshot")
         self.formLayout = QtGui.QFormLayout(self.Screenshot)
         self.formLayout.setObjectName("formLayout")
@@ -248,6 +260,8 @@ class Ui_Dialog(object):
         self.label_5.setText(QtGui.QApplication.translate("Dialog", "maxfev:", None, QtGui.QApplication.UnicodeUTF8))
         self.label_6.setText(QtGui.QApplication.translate("Dialog", "xtol:", None, QtGui.QApplication.UnicodeUTF8))
         self.label_7.setText(QtGui.QApplication.translate("Dialog", "Fit Size:", None, QtGui.QApplication.UnicodeUTF8))
+        self.label_8.setText(QtGui.QApplication.translate("Dialog", "Landmarks:", None, QtGui.QApplication.UnicodeUTF8))
+        self.label_9.setText(QtGui.QApplication.translate("Dialog", "Landmark Weights:", None, QtGui.QApplication.UnicodeUTF8))
         self.acceptButton.setText(QtGui.QApplication.translate("Dialog", "Accept", None, QtGui.QApplication.UnicodeUTF8))
         self.resetButton.setText(QtGui.QApplication.translate("Dialog", "Reset", None, QtGui.QApplication.UnicodeUTF8))
         self.abortButton.setText(QtGui.QApplication.translate("Dialog", "Abort", None, QtGui.QApplication.UnicodeUTF8))

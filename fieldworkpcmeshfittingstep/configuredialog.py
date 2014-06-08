@@ -98,6 +98,8 @@ class ConfigureDialog(QtGui.QDialog):
         config['xtol'] = self._ui.lineEditXTol.text()
         config['Fit Scale'] = self._ui.checkBoxFitSize.isChecked()
         config['N Closest Points'] = str(self._ui.spinBoxNCP.value())
+        config['Landmarks'] = self._ui.lineEditLandmarks.text()
+        config['Landmark Weights'] = self._ui.lineEditLandmarkWeights.text()
         config['GUI'] = self._ui.checkBoxGUI.isChecked()
         return config
 
@@ -117,5 +119,7 @@ class ConfigureDialog(QtGui.QDialog):
         self._ui.lineEditXTol.setText(config['xtol'])
         self._ui.checkBoxFitSize.setChecked(bool(config['Fit Scale']))
         self._ui.spinBoxNCP.setValue(int(config['N Closest Points']))
+        self._ui.lineEditLandmarks.setText(config['Landmarks'])
+        self._ui.lineEditLandmarkWeights.setText(config['Landmark Weights'])
         self._ui.checkBoxGUI.setChecked(bool(config['GUI']))
 
