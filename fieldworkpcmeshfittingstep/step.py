@@ -329,7 +329,7 @@ class FieldworkPCMeshFittingStep(WorkflowStepMountPoint):
         provides port for this step then the index can be ignored.
         '''
         if index == 6:
-            return self.GFFitted # ju#fieldworkmodel
+            return self._GFFitted # ju#fieldworkmodel
         elif index == 7:
             return self._TFitted # ju#geometrictransform
         elif index == 8:
