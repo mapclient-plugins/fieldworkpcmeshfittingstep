@@ -24,6 +24,7 @@ from PySide.QtGui import QDialog, QFileDialog, QDialogButtonBox,\
                          QAbstractItemView, QTableWidgetItem,\
                          QDoubleValidator
 from PySide.QtCore import Qt
+from PySide.QtCore import QThread, Signal
 
 from fieldworkpcmeshfittingstep.ui_mayavifittingviewerwidget import Ui_Dialog
 from traits.api import HasTraits, Instance, on_trait_change, \
@@ -33,6 +34,17 @@ from mappluginutils.mayaviviewer import MayaviViewerObjectsContainer, MayaviView
     MayaviViewerFieldworkModel, MayaviViewerLandmark, colours
 
 import copy
+
+class _ExecThread(QThread):
+    update = Signal(tuple)
+
+    def __init__(self, func):
+        QThread.__init__(self)
+        self.func = func
+
+    def run(self):
+        output = self.func()
+        self.update.emit(output)
 
 class MayaviPCMeshFittingViewerWidget(QDialog):
     '''
@@ -73,6 +85,8 @@ class MayaviPCMeshFittingViewerWidget(QDialog):
         else:
             self._landmarkNames = []
 
+        self._worker = _ExecThread(self._fitFunc)
+        self._worker.update.connect(self._fitUpdate)
 
         self._initViewerObjects()
         self._setupGui()
@@ -88,7 +102,11 @@ class MayaviPCMeshFittingViewerWidget(QDialog):
         self._ui.tableWidget.itemClicked.connect(self._tableItemClicked)
         self._ui.tableWidget.itemChanged.connect(self._visibleBoxChanged)
         self._ui.screenshotSaveButton.clicked.connect(self._saveScreenShot)
-        self._ui.fitButton.clicked.connect(self._fit)
+        
+        # self._ui.fitButton.clicked.connect(self._fit)
+        self._ui.fitButton.clicked.connect(self._worker.start)
+        self._ui.fitButton.clicked.connect(self._fitLockUI)
+
         self._ui.resetButton.clicked.connect(self._reset)
         self._ui.abortButton.clicked.connect(self._abort)
         self._ui.acceptButton.clicked.connect(self._accept)
@@ -229,9 +247,8 @@ class MayaviPCMeshFittingViewerWidget(QDialog):
         for name in self._objects.getObjectNames():
             self._objects.getObject(name).draw(self._scene)
 
-    def _fit(self):
-        GFFitted, transformFitted, RMSEFitted, errorsFitted = self._fitFunc()
-        self._GFFitted = copy.deepcopy(GFFitted)
+    def _fitUpdate(self, output):
+        GFFitted, transformFitted, RMSEFitted, errorsFitted = output
 
         # update error fields
         self._ui.RMSELineEdit.setText(str(RMSEFitted))
@@ -243,6 +260,39 @@ class MayaviPCMeshFittingViewerWidget(QDialog):
         fittedObj.updateGeometry(GFFitted.get_field_parameters(), self._scene)
         fittedTableItem = self._ui.tableWidget.item(2, self.objectTableHeaderColumns['visible'])
         fittedTableItem.setCheckState(Qt.Checked)
+
+        # unlock reg ui
+        self._fitUnlockUI()
+
+    def _fitLockUI(self):
+        self._ui.comboBoxDistanceMode.setEnabled(False)
+        self._ui.spinBoxPCsToFit.setEnabled(False)
+        self._ui.spinBoxSurfDisc.setEnabled(False)
+        self._ui.doubleSpinBoxMWeight.setEnabled(False)
+        self._ui.spinBoxMaxfev.setEnabled(False)
+        self._ui.lineEditXTol.setEnabled(False)
+        self._ui.checkBoxFitSize.setEnabled(False)
+        self._ui.lineEditLandmarks.setEnabled(False)
+        self._ui.lineEditLandmarkWeights.setEnabled(False)
+        self._ui.fitButton.setEnabled(False)
+        self._ui.resetButton.setEnabled(False)
+        self._ui.acceptButton.setEnabled(False)
+        self._ui.abortButton.setEnabled(False)
+
+    def _fitUnlockUI(self):
+        self._ui.comboBoxDistanceMode.setEnabled(True)
+        self._ui.spinBoxPCsToFit.setEnabled(True)
+        self._ui.spinBoxSurfDisc.setEnabled(True)
+        self._ui.doubleSpinBoxMWeight.setEnabled(True)
+        self._ui.spinBoxMaxfev.setEnabled(True)
+        self._ui.lineEditXTol.setEnabled(True)
+        self._ui.checkBoxFitSize.setEnabled(True)
+        self._ui.lineEditLandmarks.setEnabled(True)
+        self._ui.lineEditLandmarkWeights.setEnabled(True)
+        self._ui.fitButton.setEnabled(True)
+        self._ui.resetButton.setEnabled(True)
+        self._ui.acceptButton.setEnabled(True)
+        self._ui.abortButton.setEnabled(True)
 
     def _fitCallback(self, output):
         GFParamsFitted = output[1]

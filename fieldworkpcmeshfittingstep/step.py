@@ -285,7 +285,7 @@ class FieldworkPCMeshFittingStep(WorkflowStepMountPoint):
 
         else:
             self._fit()
-            self.GFFitted = copy.deepcopy(self.GF)
+            self.GFFitted = copy.deepcopy(self._GF)
             self._doneExecution()
 
     def _abort(self):
