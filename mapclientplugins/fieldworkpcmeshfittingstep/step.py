@@ -7,9 +7,9 @@ import os
 from PySide import QtGui
 from PySide import QtCore
 
-from mountpoints.workflowstep import WorkflowStepMountPoint
-from fieldworkpcmeshfittingstep.configuredialog import ConfigureDialog
-from fieldworkpcmeshfittingstep.mayavipcmeshfittingviewerwidget import MayaviPCMeshFittingViewerWidget
+from mapclient.mountpoints.workflowstep import WorkflowStepMountPoint
+from mapclientplugins.fieldworkpcmeshfittingstep.configuredialog import ConfigureDialog
+from mapclientplugins.fieldworkpcmeshfittingstep.mayavipcmeshfittingviewerwidget import MayaviPCMeshFittingViewerWidget
 
 import copy
 from fieldwork.field import geometric_field_fitter as GFF
@@ -309,18 +309,18 @@ class FieldworkPCMeshFittingStep(WorkflowStepMountPoint):
         ######## TODO  BELOW  #############
 
         if index == 0:
-            self._data = dataIn # ju#pointcoordinates
+            self._data = np.array(dataIn, dtype=float) # ju#pointcoordinates
         elif index == 1:
             self._GF = dataIn   # ju#fieldworkmodel
             self._GFUnfitted = copy.deepcopy(self._GF)
         elif index == 2:
             self._pc = dataIn   # ju#principalcomponents
         elif index == 3:
-            self._T0 = dataIn
+            self._T0 = dataIn   # transform list
         elif index == 4:
-            self._dataWeights = dataIn # numpyarray1d - dataWeights
+            self._dataWeights = np.array(dataIn, dtype=float) # numpyarray1d - dataWeights
         else:
-            self._landmarks = dataIn
+            self._landmarks = dataIn   # landmarks dictionary
 
     def getPortData(self, index):
         '''

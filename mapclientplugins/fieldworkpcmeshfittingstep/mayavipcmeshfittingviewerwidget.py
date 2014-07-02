@@ -26,7 +26,7 @@ from PySide.QtGui import QDialog, QFileDialog, QDialogButtonBox,\
 from PySide.QtCore import Qt
 from PySide.QtCore import QThread, Signal
 
-from fieldworkpcmeshfittingstep.ui_mayavifittingviewerwidget import Ui_Dialog
+from mapclientplugins.fieldworkpcmeshfittingstep.ui_mayavifittingviewerwidget import Ui_Dialog
 from traits.api import HasTraits, Instance, on_trait_change, \
     Int, Dict
 
