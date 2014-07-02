@@ -280,4 +280,4 @@ class Ui_Dialog(object):
         self.screenshotSaveButton.setText(QtGui.QApplication.translate("Dialog", "Save Screenshot", None, QtGui.QApplication.UnicodeUTF8))
         self.toolBox.setItemText(self.toolBox.indexOf(self.Screenshot), QtGui.QApplication.translate("Dialog", "Screenshots", None, QtGui.QApplication.UnicodeUTF8))
 
-from mayaviscenewidget import MayaviSceneWidget
+from mappluginutils.mayaviviewer.mayaviscenewidget import MayaviSceneWidget
