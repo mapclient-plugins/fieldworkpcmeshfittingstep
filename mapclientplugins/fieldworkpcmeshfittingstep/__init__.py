@@ -20,3 +20,4 @@ This file is part of MAP Client. (http://launchpad.net/mapclient)
 __version__ = '0.1.0'
 __author__ = 'Ju Zhang'
 from mapclientplugins.fieldworkpcmeshfittingstep import step
+import mapclientplugins.fieldworkpcmeshfittingstep.resources_rc

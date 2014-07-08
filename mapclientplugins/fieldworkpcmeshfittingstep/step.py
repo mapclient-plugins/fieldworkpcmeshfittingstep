@@ -45,6 +45,7 @@ class FieldworkPCMeshFittingStep(WorkflowStepMountPoint):
         self._configured = False # A step cannot be executed until it has been configured.
         self._category = 'Fitting'
         # Add any other initialisation code here:
+        self._icon = QtGui.QImage(':/fieldworkpcmeshfittingstep/images/fieldworkpcmeshfittingicon.png')
         # Ports:
         # data cloud (2d numpy array)
         self.addPort(('http://physiomeproject.org/workflow/1.0/rdf-schema#port',

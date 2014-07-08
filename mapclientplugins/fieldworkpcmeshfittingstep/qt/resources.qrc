@@ -1,0 +1,6 @@
+
+<RCC>
+  <qresource prefix="fieldworkpcmeshfittingstep">
+    <file>images/fieldworkpcmeshfittingicon.png</file>
+  </qresource>
+</RCC>
