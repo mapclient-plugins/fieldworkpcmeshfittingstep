@@ -12,11 +12,11 @@ from mapclientplugins.fieldworkpcmeshfittingstep.configuredialog import Configur
 from mapclientplugins.fieldworkpcmeshfittingstep.mayavipcmeshfittingviewerwidget import MayaviPCMeshFittingViewerWidget
 
 import copy
+import numpy as np
 from fieldwork.field import geometric_field_fitter as GFF
 from gias.learning import PCA_fitting
-from workutils import meshlandmarks
+from gias.musculoskeletal import fw_model_landmarks
 from mappluginutils.datatypes import transformations
-import numpy as np
 
 class FieldworkPCMeshFittingStep(WorkflowStepMountPoint):
     '''
@@ -171,7 +171,7 @@ class FieldworkPCMeshFittingStep(WorkflowStepMountPoint):
         else:
             ldObjs = []
             for ldName, ldTarg in ldMap:
-                evaluator = meshlandmarks.makeLandmarkEvaluator(ldName, self._GF)
+                evaluator = fw_model_landmarks.makeLandmarkEvaluator(ldName, self._GF)
                 ldObjs.append(_makeLandmarkObj(ldTarg, evaluator))
 
             def mainObj(P):
