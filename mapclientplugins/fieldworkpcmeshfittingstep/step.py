@@ -196,7 +196,7 @@ class FieldworkPCMeshFittingStep(WorkflowStepMountPoint):
             gObjMaker = GFF.makeObjDPEP
         elif self._config['Distance Mode']=='EPDP':
             gObjMaker = GFF.makeObjEPDP
-        fitModes = range(int(self._config['PCs to Fit']))
+        fitModes = np.arange(int(self._config['PCs to Fit']))
         GD = [int(self._config['Surface Discretisation']),]*2
         mWeight = float(self._config['Mahalanobis Weight'])
         xtol = float(self._config['xtol'])
@@ -224,8 +224,6 @@ class FieldworkPCMeshFittingStep(WorkflowStepMountPoint):
         PCFitter = PCA_fitting.PCFit()
         PCFitter.setPC(self._pc)
         PCFitter.xtol = xtol
-        segElements = self._GF.ensemble_field_function.mesh.elements.keys()
-        epI = self._GF.getElementPointIPerTrueElement( GD, segElements )
         obj, objNoWeights = self._makeObj(gObjMaker, GD, nClosestPoints)
        
         # get initial transform
