@@ -2,4 +2,7 @@ fieldworkpcmeshfittingstep
 ==========================
 MAP Client plugin for fitting a Fieldwork mesh using a GIAS PCA model
 
-Requires https://bitbucket.org/jangle/gias and https://bitbucket.org/jangle/fieldwork.
+Requires:
+https://bitbucket.org/jangle/gias
+https://bitbucket.org/jangle/fieldwork
+https://bitbucket.org/jangle/mappluginutils
