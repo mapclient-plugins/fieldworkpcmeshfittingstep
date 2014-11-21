@@ -50,7 +50,7 @@ class FieldworkPCMeshFittingStep(WorkflowStepMountPoint):
         # data cloud (2d numpy array)
         self.addPort(('http://physiomeproject.org/workflow/1.0/rdf-schema#port',
                       'http://physiomeproject.org/workflow/1.0/rdf-schema#uses',
-                      'ju#pointcoordinates'))
+                      'http://physiomeproject.org/workflow/1.0/rdf-schema#pointcloud'))
 
         # GF to fit (geometric_field)
         self.addPort(('http://physiomeproject.org/workflow/1.0/rdf-schema#port',
