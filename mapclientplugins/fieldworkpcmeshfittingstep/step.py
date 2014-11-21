@@ -65,7 +65,7 @@ class FieldworkPCMeshFittingStep(WorkflowStepMountPoint):
         # initial transform (transform class)
         self.addPort(('http://physiomeproject.org/workflow/1.0/rdf-schema#port',
                       'http://physiomeproject.org/workflow/1.0/rdf-schema#uses',
-                      'ju#geometrictransform'))
+                      'http://physiomeproject.org/workflow/1.0/rdf-schema#geometrictransform'))
 
         # data weights (1d numpy array, optional)
         self.addPort(('http://physiomeproject.org/workflow/1.0/rdf-schema#port',
@@ -85,7 +85,7 @@ class FieldworkPCMeshFittingStep(WorkflowStepMountPoint):
         # fitted params (rigid + mode scores)
         self.addPort(('http://physiomeproject.org/workflow/1.0/rdf-schema#port',
                       'http://physiomeproject.org/workflow/1.0/rdf-schema#provides',
-                      'ju#geometrictransform'))
+                      'http://physiomeproject.org/workflow/1.0/rdf-schema#geometrictransform'))
 
         # RMS error (float)
         self.addPort(('http://physiomeproject.org/workflow/1.0/rdf-schema#port',
