@@ -81,7 +81,7 @@ class MayaviPCMeshFittingViewerWidget(QDialog):
         self._landmarks = landmarks
         if self._landmarks is not None:
             self._landmarkNames = sorted(self._landmarks.keys())
-            print self._landmarkNames
+            print(self._landmarkNames)
         else:
             self._landmarkNames = []
 
@@ -331,7 +331,7 @@ class MayaviPCMeshFittingViewerWidget(QDialog):
         #     self._ui.tableWidget.removeRow(r)
 
     def _refresh(self):
-        for r in xrange(self._ui.tableWidget.rowCount()):
+        for r in range(self._ui.tableWidget.rowCount()):
             tableItem = self._ui.tableWidget.item(r, self.objectTableHeaderColumns['visible'])
             name = tableItem.text()
             visible = tableItem.checkState().name=='Checked'
@@ -356,7 +356,7 @@ class MayaviPCMeshFittingViewerWidget(QDialog):
         # This function is called when the view is opened. We don't
         # populate the scene when the view is not yet open, as some
         # VTK features require a GLContext.
-        print 'trait_changed'
+        print('trait_changed')
 
         # We can do normal mlab calls on the embedded scene.
         self._scene.mlab.test_points3d()

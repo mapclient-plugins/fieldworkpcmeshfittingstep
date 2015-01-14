@@ -98,7 +98,7 @@ class FieldworkPCMeshFittingStep(WorkflowStepMountPoint):
                       'numpy#array1d'))
 
         self._config = {}
-        for k, v in self._configDefaults.items():
+        for k, v in list(self._configDefaults.items()):
             self._config[k] = v
 
         self._pc = None
@@ -127,25 +127,25 @@ class FieldworkPCMeshFittingStep(WorkflowStepMountPoint):
         terms = config.strip().split(',')
         termsWeights = configWeights.strip().split(',')
         if len(terms)==0:
-            raise ValueError, 'Malformed landmarks config. Terms must be comma separated'
+            raise ValueError('Malformed landmarks config. Terms must be comma separated')
             # print 'ERROR: Malformed landmarks config. Terms must be comma separated'
             # return None, None
 
         if len(terms)!=len(termsWeights):
-            raise ValueError, 'Malformed landmarks config. Mismatch in number of landmarks and weights'
+            raise ValueError('Malformed landmarks config. Mismatch in number of landmarks and weights')
             # print 'ERROR: Malformed landmarks config. Mismatch in number of landmarks and weights'
             # return None, None
 
         for term, termWeight in zip(terms, termsWeights):
             kv = term.split(':')
             if len(kv)!=2:
-                raise ValueError, 'Malformed landmarks config. Key and values must be separated by :'
+                raise ValueError('Malformed landmarks config. Key and values must be separated by :')
                 # print 'ERROR: Malformed landmarks config. Key and values must be separated by :'
                 # return None, None
             try:
                 w = float(termWeight)
             except ValueError:
-                raise ValueError, 'Malformed landmarks config. Bad landmark weight'
+                raise ValueError('Malformed landmarks config. Bad landmark weight')
                 # print 'ERROR: Malformed landmarks config. Bad landmark weight'
                 # return None, None
 
@@ -209,16 +209,16 @@ class FieldworkPCMeshFittingStep(WorkflowStepMountPoint):
 
         print('\nFitting with parameters:')
         print('Fit params:')
-        print('Distance Mode: '+self._config['Distance Mode'])
-        print('PCs to Fit: '+str(fitModes))
-        print('GF: '+str(GD))
-        print('MWeight: '+str(mWeight))
-        print('xtol: '+str(xtol))
-        print('fit scale: '+str(fitScale))
-        print('n closest points: '+str(nClosestPoints))
-        print('maxfev: '+str(maxfev))
-        print('landmarks: '+str(self._config['Landmarks']))
-        print('landmark weights: '+str(self._config['Landmark Weights']))
+        print(('Distance Mode: '+self._config['Distance Mode']))
+        print(('PCs to Fit: '+str(fitModes)))
+        print(('GF: '+str(GD)))
+        print(('MWeight: '+str(mWeight)))
+        print(('xtol: '+str(xtol)))
+        print(('fit scale: '+str(fitScale)))
+        print(('n closest points: '+str(nClosestPoints)))
+        print(('maxfev: '+str(maxfev)))
+        print(('landmarks: '+str(self._config['Landmarks'])))
+        print(('landmark weights: '+str(self._config['Landmark Weights'])))
 
         # initialise fitter
         PCFitter = PCA_fitting.PCFit()
@@ -289,7 +289,7 @@ class FieldworkPCMeshFittingStep(WorkflowStepMountPoint):
 
     def _abort(self):
         # self._doneExecution()
-        raise RuntimeError, 'mesh fitting aborted'
+        raise RuntimeError('mesh fitting aborted')
 
     def _reset(self):
         self._GFFitted = None
@@ -379,7 +379,7 @@ class FieldworkPCMeshFittingStep(WorkflowStepMountPoint):
         configuration_file = os.path.join(location, self.getIdentifier() + '.conf')
         conf = QtCore.QSettings(configuration_file, QtCore.QSettings.IniFormat)
         conf.beginGroup('config')
-        for k in self._config.keys():
+        for k in list(self._config.keys()):
             conf.setValue(k, self._config[k])
         
         if self._config['Fit Scale']:
@@ -405,7 +405,7 @@ class FieldworkPCMeshFittingStep(WorkflowStepMountPoint):
         conf = QtCore.QSettings(configuration_file, QtCore.QSettings.IniFormat)
         conf.beginGroup('config')
 
-        for k, v in self._configDefaults.items():
+        for k, v in list(self._configDefaults.items()):
             self._config[k] = conf.value(k, v)
 
         if conf.value('Fit Scale')=='True':
