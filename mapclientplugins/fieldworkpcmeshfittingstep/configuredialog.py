@@ -117,9 +117,21 @@ class ConfigureDialog(QtGui.QDialog):
         self._ui.spinBoxSurfDisc.setValue(int(config['Surface Discretisation']))
         self._ui.spinBoxMaxfev.setValue(int(config['Max Func Evaluations']))
         self._ui.lineEditXTol.setText(config['xtol'])
-        self._ui.checkBoxFitSize.setChecked(bool(config['Fit Scale']))
+        self._ui.checkBoxFitSize.setChecked(bool(_str2bool(config['Fit Scale'])))
         self._ui.spinBoxNCP.setValue(int(config['N Closest Points']))
         self._ui.lineEditLandmarks.setText(config['Landmarks'])
         self._ui.lineEditLandmarkWeights.setText(config['Landmark Weights'])
         self._ui.checkBoxGUI.setChecked(bool(config['GUI']))
 
+def _str2bool(s):
+    s = str(s)
+    print('dong {}'.format(s))
+    if s=='True':
+        return True
+    elif s=='False':
+        return False
+    elif s=='':
+        return False
+    else:
+        print('string boolean error: {}'.format(s))
+        raise(ValueError, 'undefined str mapping to boolean: {}'.format(s))
