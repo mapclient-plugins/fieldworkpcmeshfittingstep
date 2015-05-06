@@ -113,6 +113,8 @@ class FieldworkPCMeshFittingStep(WorkflowStepMountPoint):
         self._fitErrors = None
         self._fitter = None
         self._landmarks = None
+        self._initModelState='input_model'
+        self._x0FromInputModel = None
 
         self._widget = None
 
@@ -227,10 +229,13 @@ class FieldworkPCMeshFittingStep(WorkflowStepMountPoint):
         obj, objNoWeights = self._makeObj(gObjMaker, GD, nClosestPoints)
        
         # get initial transform
-        if self._TFitted is not None:
-            x0 = self._TFitted.getT()
-        else:
-            x0 = self._T0.getT()
+        if (self._initModelState=='input_transformation'):
+            if self._TFitted is not None:
+                x0 = self._TFitted.getT()
+            else:
+                x0 = self._T0.getT()
+        elif self._initModelState=='input_model':
+            x0 = np.array(self._x0FromInputModel)
 
         if len(x0) < reqNParams:
             x0 = np.hstack([x0, np.zeros(reqNParams - len(x0))])
@@ -238,7 +243,7 @@ class FieldworkPCMeshFittingStep(WorkflowStepMountPoint):
             x0 = x0[:reqNParams]
 
         # fit
-        if fitScale:
+        if fitScale=='True':
             GXOpt, GPOpt = PCFitter.rigidScaleModeNFit(obj, modes=fitModes[1:],
                                                        x0=x0, mWeight=mWeight,
                                                        maxfev=maxfev,
@@ -255,7 +260,77 @@ class FieldworkPCMeshFittingStep(WorkflowStepMountPoint):
         # transform and GF
         self._TFitted = transformations.RigidPCModesTransform(GXOpt)
         self._GFFitted = copy.deepcopy(self._GF)
+
+        print('fitted pc parameters', GXOpt)
         return self._GFFitted, self._TFitted, self._RMSEFitted, self._fitErrors
+
+    def _initGF(self):
+
+        if self._T0 is not None:
+            self._initModelState = 'input_transformation'
+            self._initGFByInputTransform()
+        else:
+            self._initModelState = 'input_model'
+            self._initGFByInputModel() 
+
+    def _initGFByInputModel(self):
+        """Initialise the unfitted GF based on the input GF. Rigid or rigid+scale
+        fit to the input GF to get initial translation, rotation, and scale (if scale fit)
+        """
+        print('initialising model by model')
+        mWeight = float(self._config['Mahalanobis Weight'])
+        pcModes = np.arange(int(self._config['PCs to Fit']))
+        targetPoints = self._GF.get_all_point_positions()
+        scale = (self._config['Fit Scale']=='True')
+
+        xOpt, nodesOpt = PCA_fitting.fitSSMTo3DPoints(
+                            targetPoints, self._pc, pcModes, mWeight=mWeight,
+                            doScale=scale, verbose=False,
+                            )[:2]
+
+        self._x0FromInputModel = xOpt
+        self._GF.set_field_parameters(nodesOpt.T[:,:,np.newaxis])
+        self._GFUnfitted = copy.deepcopy(self._GF)
+
+    def _initGFByInputTransform(self):
+        """Initialise the unfitted GF based on the initial transformation parameters
+        if provided
+        """
+        print('initialising model by transform')
+        if self._T0 is not None:
+            T0 = self._T0.getT()
+            # apply shape model parameters
+
+            if self._config['Fit Scale']=='True':
+                pcSDs = T0[7:]
+            else:
+                pcSDs = T0[6:]
+
+            if len(pcSDs)>0:
+                pcModes = np.arange(int(self._config['PCs to Fit']))
+                reconParams = self._pc.reconstruct(
+                                self._pc.getWeightsBySD(pcModes, pcSDs),
+                                pcModes
+                                ).reshape((3,-1,1))
+                self._GF.field_parameters = reconParams
+            else:
+                reconParams = self._pc.reconstruct(
+                                self._pc.getWeightsBySD([0,], [0.0,]),
+                                [0,]
+                                ).reshape((3,-1,1))
+                self._GF.set_field_parameters(reconParams)
+            
+            # apply rigid or rigid+scale transform
+            if self._config['Fit Scale']=='True':
+                t = T0[:7]
+                self._GF.transformRigidScaleRotateAboutCoM(t)
+            else:
+                t = T0[:6]
+                self._GF.transformRigidRotateAboutCoM(t)
+
+            self._GFUnfitted = copy.deepcopy(self._GF)
+        else:
+            print('WARNING: no input transformations, nothing done')
 
     def execute(self):
         '''
@@ -263,6 +338,9 @@ class FieldworkPCMeshFittingStep(WorkflowStepMountPoint):
         Make sure you call the _doneExecution() method when finished.  This method
         may be connected up to a button in a widget for example.
         '''
+
+        # initialise unfitted model
+        self._initGF()
 
         # Put your execute step code here before calling the '_doneExecution' method.
         if self._config['GUI']:
