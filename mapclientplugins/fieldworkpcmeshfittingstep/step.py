@@ -75,7 +75,7 @@ class FieldworkPCMeshFittingStep(WorkflowStepMountPoint):
         # landmarks (optional)
         self.addPort(('http://physiomeproject.org/workflow/1.0/rdf-schema#port',
                       'http://physiomeproject.org/workflow/1.0/rdf-schema#uses',
-                      'python#dict'))
+                      'http://physiomeproject.org/workflow/1.0/rdf-schema#landmarks'))
 
         # fitted GF (geometric_field)
         self.addPort(('http://physiomeproject.org/workflow/1.0/rdf-schema#port',
