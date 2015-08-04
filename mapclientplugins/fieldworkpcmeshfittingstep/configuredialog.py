@@ -125,7 +125,6 @@ class ConfigureDialog(QtGui.QDialog):
 
 def _str2bool(s):
     s = str(s)
-    print('dong {}'.format(s))
     if s=='True':
         return True
     elif s=='False':
