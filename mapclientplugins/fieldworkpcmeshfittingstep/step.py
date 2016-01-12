@@ -3,9 +3,9 @@
 MAP Client Plugin Step
 '''
 import os
+import json
 
 from PySide import QtGui
-from PySide import QtCore
 
 from mapclient.mountpoints.workflowstep import WorkflowStepMountPoint
 from mapclientplugins.fieldworkpcmeshfittingstep.configuredialog import ConfigureDialog
@@ -446,63 +446,33 @@ class FieldworkPCMeshFittingStep(WorkflowStepMountPoint):
         '''
         self._config['identifier'] = identifier
 
-    def serialize(self, location):
+    def serialize(self):
         '''
-        Add code to serialize this step to disk.  The filename should
-        use the step identifier (received from getIdentifier()) to keep it
-        unique within the workflow.  The suggested name for the file on
-        disk is:
-            filename = getIdentifier() + '.conf'
+        Add code to serialize this step to disk. Returns a json string for
+        mapclient to serialise.
         '''
-        configuration_file = os.path.join(location, self.getIdentifier() + '.conf')
-        conf = QtCore.QSettings(configuration_file, QtCore.QSettings.IniFormat)
-        conf.beginGroup('config')
-        for k in list(self._config.keys()):
-            conf.setValue(k, self._config[k])
-        
-        if self._config['Fit Scale']:
-            conf.setValue('Fit Scale', 'True')
-        else:
-            conf.setValue('Fit Scale', 'False')  
+        return json.dumps(self._config, default=lambda o: o.__dict__, sort_keys=True, indent=4)
 
-        if self._config['GUI']:
-            conf.setValue('GUI', 'True')
-        else:
-            conf.setValue('GUI', 'False')    
-
-        conf.endGroup()
-
-    def deserialize(self, location):
+    def deserialize(self, string):
         '''
-        Add code to deserialize this step from disk.  As with the serialize 
-        method the filename should use the step identifier.  Obviously the 
-        filename used here should be the same as the one used by the
-        serialize method.
+        Add code to deserialize this step from disk. Parses a json string
+        given by mapclient
         '''
-        configuration_file = os.path.join(location, self.getIdentifier() + '.conf')
-        conf = QtCore.QSettings(configuration_file, QtCore.QSettings.IniFormat)
-        conf.beginGroup('config')
-
-        for k, v in list(self._configDefaults.items()):
-            self._config[k] = conf.value(k, v)
-
-        if conf.value('Fit Scale')=='True':
+        self._config.update(json.loads(string))
+        if self._config['Fit Scale']=='True':
             self._config['Fit Scale'] = True
-        elif conf.value('Fit Scale')=='False':
+        else:
             self._config['Fit Scale'] = False
 
-        if conf.value('GUI')=='True':
+        if self._config['GUI']=='True':
             self._config['GUI'] = True
-        elif conf.value('GUI')=='False':
+        else:
             self._config['GUI'] = False
 
-        conf.endGroup()
-
-        d = ConfigureDialog(self._distModes)
+        d = ConfigureDialog()
         d.identifierOccursCount = self._identifierOccursCount
         d.setConfig(self._config)
         self._configured = d.validate()
-
 
 def _makeLandmarkObj(targ, evaluator):
     def obj(P):
