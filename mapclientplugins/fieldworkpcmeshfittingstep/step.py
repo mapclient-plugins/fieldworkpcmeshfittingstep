@@ -34,11 +34,11 @@ class FieldworkPCMeshFittingStep(WorkflowStepMountPoint):
     _configDefaults['Mahalanobis Weight'] = '0.1'
     _configDefaults['Max Func Evaluations'] = '1000'
     _configDefaults['xtol'] = '1e-6'
-    _configDefaults['Fit Scale'] = 'False'
+    _configDefaults['Fit Scale'] = False
     _configDefaults['N Closest Points'] = '1'
     _configDefaults['Landmarks'] = ''
     _configDefaults['Landmark Weights'] = ''
-    _configDefaults['GUI'] = 'True'
+    _configDefaults['GUI'] = True
 
     def __init__(self, location):
         super(FieldworkPCMeshFittingStep, self).__init__('Fieldwork PC Mesh Fitting', location)
@@ -459,6 +459,8 @@ class FieldworkPCMeshFittingStep(WorkflowStepMountPoint):
         given by mapclient
         '''
         self._config.update(json.loads(string))
+
+        # for config from older versions
         if self._config['Fit Scale']=='True':
             self._config['Fit Scale'] = True
         else:
