@@ -16,7 +16,7 @@ import numpy as np
 from gias2.fieldwork.field import geometric_field_fitter as GFF
 from gias2.learning import PCA_fitting
 from gias2.musculoskeletal import fw_model_landmarks
-from mappluginutils.datatypes import transformations
+from gias2.mappluginutils.datatypes import transformations
 
 class FieldworkPCMeshFittingStep(WorkflowStepMountPoint):
     '''

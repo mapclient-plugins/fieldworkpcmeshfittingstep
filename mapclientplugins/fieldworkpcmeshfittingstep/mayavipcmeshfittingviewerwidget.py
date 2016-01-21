@@ -30,8 +30,9 @@ from mapclientplugins.fieldworkpcmeshfittingstep.ui_mayavifittingviewerwidget im
 from traits.api import HasTraits, Instance, on_trait_change, \
     Int, Dict
 
-from mappluginutils.mayaviviewer import MayaviViewerObjectsContainer, MayaviViewerDataPoints,\
-    MayaviViewerFieldworkModel, MayaviViewerLandmark, colours
+from gias2.mappluginutils.mayaviviewer import MayaviViewerObjectsContainer,\
+    MayaviViewerDataPoints, MayaviViewerFieldworkModel, MayaviViewerLandmark,\
+    colours
 
 import copy
 
