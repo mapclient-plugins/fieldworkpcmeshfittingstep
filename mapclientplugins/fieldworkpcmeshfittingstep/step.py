@@ -13,9 +13,9 @@ from mapclientplugins.fieldworkpcmeshfittingstep.mayavipcmeshfittingviewerwidget
 
 import copy
 import numpy as np
-from fieldwork.field import geometric_field_fitter as GFF
-from gias.learning import PCA_fitting
-from gias.musculoskeletal import fw_model_landmarks
+from gias2.fieldwork.field import geometric_field_fitter as GFF
+from gias2.learning import PCA_fitting
+from gias2.musculoskeletal import fw_model_landmarks
 from mappluginutils.datatypes import transformations
 
 class FieldworkPCMeshFittingStep(WorkflowStepMountPoint):
