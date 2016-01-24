@@ -471,7 +471,7 @@ class FieldworkPCMeshFittingStep(WorkflowStepMountPoint):
         elif self._config['GUI']=='False':
             self._config['GUI'] = False
 
-        d = ConfigureDialog()
+        d = ConfigureDialog(self._distModes)
         d.identifierOccursCount = self._identifierOccursCount
         d.setConfig(self._config)
         self._configured = d.validate()
