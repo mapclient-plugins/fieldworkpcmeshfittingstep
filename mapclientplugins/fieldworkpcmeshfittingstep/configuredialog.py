@@ -1,10 +1,9 @@
-
-
 from PySide2 import QtGui, QtWidgets
 from mapclientplugins.fieldworkpcmeshfittingstep.ui_configuredialog import Ui_Dialog
 
 INVALID_STYLE_SHEET = 'background-color: rgba(239, 0, 0, 50)'
 DEFAULT_STYLE_SHEET = ''
+
 
 class ConfigureDialog(QtWidgets.QDialog):
     '''
@@ -16,7 +15,7 @@ class ConfigureDialog(QtWidgets.QDialog):
         Constructor
         '''
         QtWidgets.QDialog.__init__(self, parent)
-        
+
         self._ui = Ui_Dialog()
         self._ui.setupUi(self)
 
@@ -44,7 +43,6 @@ class ConfigureDialog(QtWidgets.QDialog):
         self._ui.spinBoxMaxfev.setSingleStep(100)
         self._ui.spinBoxNCP.setSingleStep(1)
 
-
     def _makeConnections(self):
         self._ui.lineEdit0.textChanged.connect(self.validate)
 
@@ -56,8 +54,9 @@ class ConfigureDialog(QtWidgets.QDialog):
         result = QtWidgets.QMessageBox.Yes
         if not self.validate():
             result = QtWidgets.QMessageBox.warning(self, 'Invalid Configuration',
-                'This configuration is invalid.  Unpredictable behaviour may result if you choose \'Yes\', are you sure you want to save this configuration?)',
-                QtWidgets.QMessageBox.Yes | QtWidgets.QMessageBox.No, QtWidgets.QMessageBox.No)
+                                                   'This configuration is invalid.  Unpredictable behaviour may result if you choose \'Yes\', are you sure you want to save this configuration?)',
+                                                   QtWidgets.QMessageBox.Yes | QtWidgets.QMessageBox.No,
+                                                   QtWidgets.QMessageBox.No)
 
         if result == QtWidgets.QMessageBox.Yes:
             QtWidgets.QDialog.accept(self)
@@ -122,14 +121,15 @@ class ConfigureDialog(QtWidgets.QDialog):
         self._ui.lineEditLandmarkWeights.setText(config['Landmark Weights'])
         self._ui.checkBoxGUI.setChecked(bool(config['GUI']))
 
+
 def _str2bool(s):
     s = str(s)
-    if s=='True':
+    if s == 'True':
         return True
-    elif s=='False':
+    elif s == 'False':
         return False
-    elif s=='':
+    elif s == '':
         return False
     else:
         print('string boolean error: {}'.format(s))
-        raise(ValueError, 'undefined str mapping to boolean: {}'.format(s))
+        raise (ValueError, 'undefined str mapping to boolean: {}'.format(s))
