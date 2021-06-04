@@ -18,7 +18,7 @@ This file is part of MAP Client. (http://launchpad.net/mapclient)
     along with MAP Client.  If not, see <http://www.gnu.org/licenses/>..
 '''
 import os
-os.environ['ETS_TOOLKIT'] = 'qt4'
+os.environ['ETS_TOOLKIT'] = 'qt5'
 
 from PySide2.QtWidgets import QDialog, QAbstractItemView, QTableWidgetItem
 from PySide2.QtGui import QDoubleValidator
