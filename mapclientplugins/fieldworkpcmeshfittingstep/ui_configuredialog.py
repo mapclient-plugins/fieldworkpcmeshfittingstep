@@ -1,124 +1,182 @@
 # -*- coding: utf-8 -*-
 
-# Form implementation generated from reading ui file 'configuredialog.ui'
-#
-# Created: Sun Jun  8 14:05:10 2014
-#      by: pyside-uic 0.2.14 running on PySide 1.1.2
-#
-# WARNING! All changes made in this file will be lost!
+################################################################################
+## Form generated from reading UI file 'configuredialog.ui'
+##
+## Created by: Qt User Interface Compiler version 5.15.2
+##
+## WARNING! All changes made in this file will be lost when recompiling UI file!
+################################################################################
 
-from PySide import QtCore, QtGui
+from PySide2.QtCore import *
+from PySide2.QtGui import *
+from PySide2.QtWidgets import *
+
 
 class Ui_Dialog(object):
     def setupUi(self, Dialog):
-        Dialog.setObjectName("Dialog")
+        if not Dialog.objectName():
+            Dialog.setObjectName(u"Dialog")
         Dialog.resize(418, 491)
-        self.gridLayout = QtGui.QGridLayout(Dialog)
-        self.gridLayout.setObjectName("gridLayout")
-        self.buttonBox = QtGui.QDialogButtonBox(Dialog)
-        self.buttonBox.setOrientation(QtCore.Qt.Horizontal)
-        self.buttonBox.setStandardButtons(QtGui.QDialogButtonBox.Cancel|QtGui.QDialogButtonBox.Ok)
-        self.buttonBox.setObjectName("buttonBox")
+        self.gridLayout = QGridLayout(Dialog)
+        self.gridLayout.setObjectName(u"gridLayout")
+        self.buttonBox = QDialogButtonBox(Dialog)
+        self.buttonBox.setObjectName(u"buttonBox")
+        self.buttonBox.setOrientation(Qt.Horizontal)
+        self.buttonBox.setStandardButtons(QDialogButtonBox.Cancel|QDialogButtonBox.Ok)
+
         self.gridLayout.addWidget(self.buttonBox, 1, 0, 1, 1)
-        self.configGroupBox = QtGui.QGroupBox(Dialog)
-        self.configGroupBox.setTitle("")
-        self.configGroupBox.setObjectName("configGroupBox")
-        self.formLayout = QtGui.QFormLayout(self.configGroupBox)
-        self.formLayout.setFieldGrowthPolicy(QtGui.QFormLayout.AllNonFixedFieldsGrow)
-        self.formLayout.setObjectName("formLayout")
-        self.label0 = QtGui.QLabel(self.configGroupBox)
-        self.label0.setObjectName("label0")
-        self.formLayout.setWidget(0, QtGui.QFormLayout.LabelRole, self.label0)
-        self.lineEdit0 = QtGui.QLineEdit(self.configGroupBox)
-        self.lineEdit0.setObjectName("lineEdit0")
-        self.formLayout.setWidget(0, QtGui.QFormLayout.FieldRole, self.lineEdit0)
-        self.label9 = QtGui.QLabel(self.configGroupBox)
-        self.label9.setObjectName("label9")
-        self.formLayout.setWidget(2, QtGui.QFormLayout.LabelRole, self.label9)
-        self.comboBoxDistanceMode = QtGui.QComboBox(self.configGroupBox)
-        self.comboBoxDistanceMode.setObjectName("comboBoxDistanceMode")
-        self.formLayout.setWidget(2, QtGui.QFormLayout.FieldRole, self.comboBoxDistanceMode)
-        self.label1 = QtGui.QLabel(self.configGroupBox)
-        self.label1.setObjectName("label1")
-        self.formLayout.setWidget(3, QtGui.QFormLayout.LabelRole, self.label1)
-        self.label2 = QtGui.QLabel(self.configGroupBox)
-        self.label2.setObjectName("label2")
-        self.formLayout.setWidget(4, QtGui.QFormLayout.LabelRole, self.label2)
-        self.label3 = QtGui.QLabel(self.configGroupBox)
-        self.label3.setObjectName("label3")
-        self.formLayout.setWidget(5, QtGui.QFormLayout.LabelRole, self.label3)
-        self.label4 = QtGui.QLabel(self.configGroupBox)
-        self.label4.setObjectName("label4")
-        self.formLayout.setWidget(6, QtGui.QFormLayout.LabelRole, self.label4)
-        self.label5 = QtGui.QLabel(self.configGroupBox)
-        self.label5.setObjectName("label5")
-        self.formLayout.setWidget(7, QtGui.QFormLayout.LabelRole, self.label5)
-        self.label8 = QtGui.QLabel(self.configGroupBox)
-        self.label8.setObjectName("label8")
-        self.formLayout.setWidget(8, QtGui.QFormLayout.LabelRole, self.label8)
-        self.label10 = QtGui.QLabel(self.configGroupBox)
-        self.label10.setObjectName("label10")
-        self.formLayout.setWidget(9, QtGui.QFormLayout.LabelRole, self.label10)
-        self.label14 = QtGui.QLabel(self.configGroupBox)
-        self.label14.setObjectName("label14")
-        self.formLayout.setWidget(12, QtGui.QFormLayout.LabelRole, self.label14)
-        self.checkBoxGUI = QtGui.QCheckBox(self.configGroupBox)
-        self.checkBoxGUI.setText("")
-        self.checkBoxGUI.setObjectName("checkBoxGUI")
-        self.formLayout.setWidget(12, QtGui.QFormLayout.FieldRole, self.checkBoxGUI)
-        self.checkBoxFitSize = QtGui.QCheckBox(self.configGroupBox)
-        self.checkBoxFitSize.setText("")
-        self.checkBoxFitSize.setObjectName("checkBoxFitSize")
-        self.formLayout.setWidget(8, QtGui.QFormLayout.FieldRole, self.checkBoxFitSize)
-        self.spinBoxPCsToFit = QtGui.QSpinBox(self.configGroupBox)
-        self.spinBoxPCsToFit.setObjectName("spinBoxPCsToFit")
-        self.formLayout.setWidget(3, QtGui.QFormLayout.FieldRole, self.spinBoxPCsToFit)
-        self.spinBoxSurfDisc = QtGui.QSpinBox(self.configGroupBox)
-        self.spinBoxSurfDisc.setObjectName("spinBoxSurfDisc")
-        self.formLayout.setWidget(4, QtGui.QFormLayout.FieldRole, self.spinBoxSurfDisc)
-        self.doubleSpinBoxMWeight = QtGui.QDoubleSpinBox(self.configGroupBox)
-        self.doubleSpinBoxMWeight.setObjectName("doubleSpinBoxMWeight")
-        self.formLayout.setWidget(5, QtGui.QFormLayout.FieldRole, self.doubleSpinBoxMWeight)
-        self.spinBoxMaxfev = QtGui.QSpinBox(self.configGroupBox)
-        self.spinBoxMaxfev.setObjectName("spinBoxMaxfev")
-        self.formLayout.setWidget(6, QtGui.QFormLayout.FieldRole, self.spinBoxMaxfev)
-        self.spinBoxNCP = QtGui.QSpinBox(self.configGroupBox)
-        self.spinBoxNCP.setObjectName("spinBoxNCP")
-        self.formLayout.setWidget(9, QtGui.QFormLayout.FieldRole, self.spinBoxNCP)
-        self.lineEditXTol = QtGui.QLineEdit(self.configGroupBox)
-        self.lineEditXTol.setObjectName("lineEditXTol")
-        self.formLayout.setWidget(7, QtGui.QFormLayout.FieldRole, self.lineEditXTol)
-        self.lineEditLandmarks = QtGui.QLineEdit(self.configGroupBox)
-        self.lineEditLandmarks.setObjectName("lineEditLandmarks")
-        self.formLayout.setWidget(10, QtGui.QFormLayout.FieldRole, self.lineEditLandmarks)
-        self.label = QtGui.QLabel(self.configGroupBox)
-        self.label.setObjectName("label")
-        self.formLayout.setWidget(10, QtGui.QFormLayout.LabelRole, self.label)
-        self.label_2 = QtGui.QLabel(self.configGroupBox)
-        self.label_2.setObjectName("label_2")
-        self.formLayout.setWidget(11, QtGui.QFormLayout.LabelRole, self.label_2)
-        self.lineEditLandmarkWeights = QtGui.QLineEdit(self.configGroupBox)
-        self.lineEditLandmarkWeights.setObjectName("lineEditLandmarkWeights")
-        self.formLayout.setWidget(11, QtGui.QFormLayout.FieldRole, self.lineEditLandmarkWeights)
+
+        self.configGroupBox = QGroupBox(Dialog)
+        self.configGroupBox.setObjectName(u"configGroupBox")
+        self.formLayout = QFormLayout(self.configGroupBox)
+        self.formLayout.setObjectName(u"formLayout")
+        self.formLayout.setFieldGrowthPolicy(QFormLayout.AllNonFixedFieldsGrow)
+        self.label0 = QLabel(self.configGroupBox)
+        self.label0.setObjectName(u"label0")
+
+        self.formLayout.setWidget(0, QFormLayout.LabelRole, self.label0)
+
+        self.lineEdit0 = QLineEdit(self.configGroupBox)
+        self.lineEdit0.setObjectName(u"lineEdit0")
+
+        self.formLayout.setWidget(0, QFormLayout.FieldRole, self.lineEdit0)
+
+        self.label9 = QLabel(self.configGroupBox)
+        self.label9.setObjectName(u"label9")
+
+        self.formLayout.setWidget(2, QFormLayout.LabelRole, self.label9)
+
+        self.comboBoxDistanceMode = QComboBox(self.configGroupBox)
+        self.comboBoxDistanceMode.setObjectName(u"comboBoxDistanceMode")
+
+        self.formLayout.setWidget(2, QFormLayout.FieldRole, self.comboBoxDistanceMode)
+
+        self.label1 = QLabel(self.configGroupBox)
+        self.label1.setObjectName(u"label1")
+
+        self.formLayout.setWidget(3, QFormLayout.LabelRole, self.label1)
+
+        self.label2 = QLabel(self.configGroupBox)
+        self.label2.setObjectName(u"label2")
+
+        self.formLayout.setWidget(4, QFormLayout.LabelRole, self.label2)
+
+        self.label3 = QLabel(self.configGroupBox)
+        self.label3.setObjectName(u"label3")
+
+        self.formLayout.setWidget(5, QFormLayout.LabelRole, self.label3)
+
+        self.label4 = QLabel(self.configGroupBox)
+        self.label4.setObjectName(u"label4")
+
+        self.formLayout.setWidget(6, QFormLayout.LabelRole, self.label4)
+
+        self.label5 = QLabel(self.configGroupBox)
+        self.label5.setObjectName(u"label5")
+
+        self.formLayout.setWidget(7, QFormLayout.LabelRole, self.label5)
+
+        self.label8 = QLabel(self.configGroupBox)
+        self.label8.setObjectName(u"label8")
+
+        self.formLayout.setWidget(8, QFormLayout.LabelRole, self.label8)
+
+        self.label10 = QLabel(self.configGroupBox)
+        self.label10.setObjectName(u"label10")
+
+        self.formLayout.setWidget(9, QFormLayout.LabelRole, self.label10)
+
+        self.label14 = QLabel(self.configGroupBox)
+        self.label14.setObjectName(u"label14")
+
+        self.formLayout.setWidget(12, QFormLayout.LabelRole, self.label14)
+
+        self.checkBoxGUI = QCheckBox(self.configGroupBox)
+        self.checkBoxGUI.setObjectName(u"checkBoxGUI")
+
+        self.formLayout.setWidget(12, QFormLayout.FieldRole, self.checkBoxGUI)
+
+        self.checkBoxFitSize = QCheckBox(self.configGroupBox)
+        self.checkBoxFitSize.setObjectName(u"checkBoxFitSize")
+
+        self.formLayout.setWidget(8, QFormLayout.FieldRole, self.checkBoxFitSize)
+
+        self.spinBoxPCsToFit = QSpinBox(self.configGroupBox)
+        self.spinBoxPCsToFit.setObjectName(u"spinBoxPCsToFit")
+
+        self.formLayout.setWidget(3, QFormLayout.FieldRole, self.spinBoxPCsToFit)
+
+        self.spinBoxSurfDisc = QSpinBox(self.configGroupBox)
+        self.spinBoxSurfDisc.setObjectName(u"spinBoxSurfDisc")
+
+        self.formLayout.setWidget(4, QFormLayout.FieldRole, self.spinBoxSurfDisc)
+
+        self.doubleSpinBoxMWeight = QDoubleSpinBox(self.configGroupBox)
+        self.doubleSpinBoxMWeight.setObjectName(u"doubleSpinBoxMWeight")
+
+        self.formLayout.setWidget(5, QFormLayout.FieldRole, self.doubleSpinBoxMWeight)
+
+        self.spinBoxMaxfev = QSpinBox(self.configGroupBox)
+        self.spinBoxMaxfev.setObjectName(u"spinBoxMaxfev")
+
+        self.formLayout.setWidget(6, QFormLayout.FieldRole, self.spinBoxMaxfev)
+
+        self.spinBoxNCP = QSpinBox(self.configGroupBox)
+        self.spinBoxNCP.setObjectName(u"spinBoxNCP")
+
+        self.formLayout.setWidget(9, QFormLayout.FieldRole, self.spinBoxNCP)
+
+        self.lineEditXTol = QLineEdit(self.configGroupBox)
+        self.lineEditXTol.setObjectName(u"lineEditXTol")
+
+        self.formLayout.setWidget(7, QFormLayout.FieldRole, self.lineEditXTol)
+
+        self.lineEditLandmarks = QLineEdit(self.configGroupBox)
+        self.lineEditLandmarks.setObjectName(u"lineEditLandmarks")
+
+        self.formLayout.setWidget(10, QFormLayout.FieldRole, self.lineEditLandmarks)
+
+        self.label = QLabel(self.configGroupBox)
+        self.label.setObjectName(u"label")
+
+        self.formLayout.setWidget(10, QFormLayout.LabelRole, self.label)
+
+        self.label_2 = QLabel(self.configGroupBox)
+        self.label_2.setObjectName(u"label_2")
+
+        self.formLayout.setWidget(11, QFormLayout.LabelRole, self.label_2)
+
+        self.lineEditLandmarkWeights = QLineEdit(self.configGroupBox)
+        self.lineEditLandmarkWeights.setObjectName(u"lineEditLandmarkWeights")
+
+        self.formLayout.setWidget(11, QFormLayout.FieldRole, self.lineEditLandmarkWeights)
+
+
         self.gridLayout.addWidget(self.configGroupBox, 0, 0, 1, 1)
 
+
         self.retranslateUi(Dialog)
-        QtCore.QObject.connect(self.buttonBox, QtCore.SIGNAL("accepted()"), Dialog.accept)
-        QtCore.QObject.connect(self.buttonBox, QtCore.SIGNAL("rejected()"), Dialog.reject)
-        QtCore.QMetaObject.connectSlotsByName(Dialog)
+
+        QMetaObject.connectSlotsByName(Dialog)
+    # setupUi
 
     def retranslateUi(self, Dialog):
-        Dialog.setWindowTitle(QtGui.QApplication.translate("Dialog", "ConfigureDialog", None, QtGui.QApplication.UnicodeUTF8))
-        self.label0.setText(QtGui.QApplication.translate("Dialog", "identifier:  ", None, QtGui.QApplication.UnicodeUTF8))
-        self.label9.setText(QtGui.QApplication.translate("Dialog", "Distance Mode:", None, QtGui.QApplication.UnicodeUTF8))
-        self.label1.setText(QtGui.QApplication.translate("Dialog", "PCs to Fit:", None, QtGui.QApplication.UnicodeUTF8))
-        self.label2.setText(QtGui.QApplication.translate("Dialog", "Surface Discretisation:", None, QtGui.QApplication.UnicodeUTF8))
-        self.label3.setText(QtGui.QApplication.translate("Dialog", "Mahalanobis Weight:", None, QtGui.QApplication.UnicodeUTF8))
-        self.label4.setText(QtGui.QApplication.translate("Dialog", "Max Func Eval:", None, QtGui.QApplication.UnicodeUTF8))
-        self.label5.setText(QtGui.QApplication.translate("Dialog", "xtol:", None, QtGui.QApplication.UnicodeUTF8))
-        self.label8.setText(QtGui.QApplication.translate("Dialog", "Fit Size:", None, QtGui.QApplication.UnicodeUTF8))
-        self.label10.setText(QtGui.QApplication.translate("Dialog", "N Closest Points:  ", None, QtGui.QApplication.UnicodeUTF8))
-        self.label14.setText(QtGui.QApplication.translate("Dialog", "GUI:", None, QtGui.QApplication.UnicodeUTF8))
-        self.label.setText(QtGui.QApplication.translate("Dialog", "Landmarks:", None, QtGui.QApplication.UnicodeUTF8))
-        self.label_2.setText(QtGui.QApplication.translate("Dialog", "Landmark Weights:", None, QtGui.QApplication.UnicodeUTF8))
+        Dialog.setWindowTitle(QCoreApplication.translate("Dialog", u"ConfigureDialog", None))
+        self.configGroupBox.setTitle("")
+        self.label0.setText(QCoreApplication.translate("Dialog", u"identifier:  ", None))
+        self.label9.setText(QCoreApplication.translate("Dialog", u"Distance Mode:", None))
+        self.label1.setText(QCoreApplication.translate("Dialog", u"PCs to Fit:", None))
+        self.label2.setText(QCoreApplication.translate("Dialog", u"Surface Discretisation:", None))
+        self.label3.setText(QCoreApplication.translate("Dialog", u"Mahalanobis Weight:", None))
+        self.label4.setText(QCoreApplication.translate("Dialog", u"Max Func Eval:", None))
+        self.label5.setText(QCoreApplication.translate("Dialog", u"xtol:", None))
+        self.label8.setText(QCoreApplication.translate("Dialog", u"Fit Size:", None))
+        self.label10.setText(QCoreApplication.translate("Dialog", u"N Closest Points:  ", None))
+        self.label14.setText(QCoreApplication.translate("Dialog", u"GUI:", None))
+        self.checkBoxGUI.setText("")
+        self.checkBoxFitSize.setText("")
+        self.label.setText(QCoreApplication.translate("Dialog", u"Landmarks:", None))
+        self.label_2.setText(QCoreApplication.translate("Dialog", u"Landmark Weights:", None))
+    # retranslateUi
 
