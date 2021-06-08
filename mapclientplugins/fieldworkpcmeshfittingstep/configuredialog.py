@@ -1,13 +1,11 @@
-
-
-from PySide import QtGui
-from PySide.QtGui import QDialog, QFileDialog, QDialogButtonBox
+from PySide2 import QtGui, QtWidgets
 from mapclientplugins.fieldworkpcmeshfittingstep.ui_configuredialog import Ui_Dialog
 
 INVALID_STYLE_SHEET = 'background-color: rgba(239, 0, 0, 50)'
 DEFAULT_STYLE_SHEET = ''
 
-class ConfigureDialog(QtGui.QDialog):
+
+class ConfigureDialog(QtWidgets.QDialog):
     '''
     Configure dialog to present the user with the options to configure this step.
     '''
@@ -16,8 +14,8 @@ class ConfigureDialog(QtGui.QDialog):
         '''
         Constructor
         '''
-        QtGui.QDialog.__init__(self, parent)
-        
+        QtWidgets.QDialog.__init__(self, parent)
+
         self._ui = Ui_Dialog()
         self._ui.setupUi(self)
 
@@ -45,7 +43,6 @@ class ConfigureDialog(QtGui.QDialog):
         self._ui.spinBoxMaxfev.setSingleStep(100)
         self._ui.spinBoxNCP.setSingleStep(1)
 
-
     def _makeConnections(self):
         self._ui.lineEdit0.textChanged.connect(self.validate)
 
@@ -54,14 +51,15 @@ class ConfigureDialog(QtGui.QDialog):
         Override the accept method so that we can confirm saving an
         invalid configuration.
         '''
-        result = QtGui.QMessageBox.Yes
+        result = QtWidgets.QMessageBox.Yes
         if not self.validate():
-            result = QtGui.QMessageBox.warning(self, 'Invalid Configuration',
-                'This configuration is invalid.  Unpredictable behaviour may result if you choose \'Yes\', are you sure you want to save this configuration?)',
-                QtGui.QMessageBox.Yes | QtGui.QMessageBox.No, QtGui.QMessageBox.No)
+            result = QtWidgets.QMessageBox.warning(self, 'Invalid Configuration',
+                                                   'This configuration is invalid.  Unpredictable behaviour may result if you choose \'Yes\', are you sure you want to save this configuration?)',
+                                                   QtWidgets.QMessageBox.Yes | QtWidgets.QMessageBox.No,
+                                                   QtWidgets.QMessageBox.No)
 
-        if result == QtGui.QMessageBox.Yes:
-            QtGui.QDialog.accept(self)
+        if result == QtWidgets.QMessageBox.Yes:
+            QtWidgets.QDialog.accept(self)
 
     def validate(self):
         '''
@@ -78,7 +76,7 @@ class ConfigureDialog(QtGui.QDialog):
         else:
             self._ui.lineEdit0.setStyleSheet(INVALID_STYLE_SHEET)
 
-        self._ui.buttonBox.button(QDialogButtonBox.Ok).setEnabled(valid)
+        self._ui.buttonBox.button(QtWidgets.QDialogButtonBox.Ok).setEnabled(valid)
         return valid
 
     def getConfig(self):
@@ -123,14 +121,15 @@ class ConfigureDialog(QtGui.QDialog):
         self._ui.lineEditLandmarkWeights.setText(config['Landmark Weights'])
         self._ui.checkBoxGUI.setChecked(bool(config['GUI']))
 
+
 def _str2bool(s):
     s = str(s)
-    if s=='True':
+    if s == 'True':
         return True
-    elif s=='False':
+    elif s == 'False':
         return False
-    elif s=='':
+    elif s == '':
         return False
     else:
         print('string boolean error: {}'.format(s))
-        raise(ValueError, 'undefined str mapping to boolean: {}'.format(s))
+        raise (ValueError, 'undefined str mapping to boolean: {}'.format(s))

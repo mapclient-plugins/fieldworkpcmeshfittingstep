@@ -21,7 +21,7 @@
   </property>
   <layout class="QHBoxLayout" name="horizontalLayout_2">
    <item>
-    <widget class="QWidget" name="widget" native="true">
+    <widget class="QWidget" name="widgetMain" native="true">
      <property name="enabled">
       <bool>true</bool>
      </property>
@@ -108,8 +108,8 @@
              <rect>
               <x>0</x>
               <y>0</y>
-              <width>319</width>
-              <height>542</height>
+              <width>307</width>
+              <height>529</height>
              </rect>
             </property>
             <attribute name="label">
@@ -324,8 +324,8 @@
              <rect>
               <x>0</x>
               <y>0</y>
-              <width>332</width>
-              <height>499</height>
+              <width>191</width>
+              <height>143</height>
              </rect>
             </property>
             <attribute name="label">
@@ -443,7 +443,7 @@
   <customwidget>
    <class>MayaviSceneWidget</class>
    <extends>QWidget</extends>
-   <header>mayaviscenewidget.h</header>
+   <header>gias2/mappluginutils/mayaviviewer/mayaviscenewidget.h</header>
    <container>1</container>
   </customwidget>
  </customwidgets>

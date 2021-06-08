@@ -18,23 +18,24 @@ This file is part of MAP Client. (http://launchpad.net/mapclient)
     along with MAP Client.  If not, see <http://www.gnu.org/licenses/>..
 '''
 import os
-os.environ['ETS_TOOLKIT'] = 'qt4'
 
-from PySide.QtGui import QDialog, QFileDialog, QDialogButtonBox,\
-                         QAbstractItemView, QTableWidgetItem,\
-                         QDoubleValidator
-from PySide.QtCore import Qt
-from PySide.QtCore import QThread, Signal
+os.environ['ETS_TOOLKIT'] = 'qt'
+
+from PySide2.QtWidgets import QDialog, QAbstractItemView, QTableWidgetItem
+from PySide2.QtGui import QDoubleValidator
+from PySide2.QtCore import Qt
+from PySide2.QtCore import QThread, Signal
 
 from mapclientplugins.fieldworkpcmeshfittingstep.ui_mayavifittingviewerwidget import Ui_Dialog
 from traits.api import HasTraits, Instance, on_trait_change, \
     Int, Dict
 
-from gias2.mappluginutils.mayaviviewer import MayaviViewerObjectsContainer,\
-    MayaviViewerDataPoints, MayaviViewerFieldworkModel, MayaviViewerLandmark,\
+from gias2.mappluginutils.mayaviviewer import MayaviViewerObjectsContainer, \
+    MayaviViewerDataPoints, MayaviViewerFieldworkModel, MayaviViewerLandmark, \
     colours
 
 import copy
+
 
 class _ExecThread(QThread):
     update = Signal(tuple)
@@ -47,18 +48,19 @@ class _ExecThread(QThread):
         output = self.func()
         self.update.emit(output)
 
+
 class MayaviPCMeshFittingViewerWidget(QDialog):
     '''
     Configure dialog to present the user with the options to configure this step.
     '''
     defaultColor = colours['bone']
-    objectTableHeaderColumns = {'visible':0}
-    backgroundColour = (0.0,0.0,0.0)
-    _dataRenderArgs = {'mode':'point', 'scale_factor':0.5, 'color':(0,1,0)}
-    _GFUnfittedRenderArgs = {'color':(1,0,0)}
-    _GFFittedRenderArgs = {'color':(1,1,0)}
-    _landmarkRenderArgs = {'mode':'sphere', 'scale_factor':5.0, 'color':(0,1,0)}
-    _GFD = [12,12]
+    objectTableHeaderColumns = {'visible': 0}
+    backgroundColour = (0.0, 0.0, 0.0)
+    _dataRenderArgs = {'mode': 'point', 'scale_factor': 0.5, 'color': (0, 1, 0)}
+    _GFUnfittedRenderArgs = {'color': (1, 0, 0)}
+    _GFFittedRenderArgs = {'color': (1, 1, 0)}
+    _landmarkRenderArgs = {'mode': 'sphere', 'scale_factor': 5.0, 'color': (0, 1, 0)}
+    _GFD = [12, 12]
 
     def __init__(self, data, GFUnfitted, config, fitFunc, resetCallback, distModes, landmarks=None, parent=None):
         '''
@@ -103,7 +105,7 @@ class MayaviPCMeshFittingViewerWidget(QDialog):
         self._ui.tableWidget.itemClicked.connect(self._tableItemClicked)
         self._ui.tableWidget.itemChanged.connect(self._visibleBoxChanged)
         self._ui.screenshotSaveButton.clicked.connect(self._saveScreenShot)
-        
+
         # self._ui.fitButton.clicked.connect(self._fit)
         self._ui.fitButton.clicked.connect(self._worker.start)
         self._ui.fitButton.clicked.connect(self._fitLockUI)
@@ -124,7 +126,7 @@ class MayaviPCMeshFittingViewerWidget(QDialog):
 
     def _initViewerObjects(self):
         self._objects = MayaviViewerObjectsContainer()
-        self._objects.addObject('data', 
+        self._objects.addObject('data',
                                 MayaviViewerDataPoints('data',
                                                        self._data,
                                                        renderArgs=self._dataRenderArgs))
@@ -144,7 +146,6 @@ class MayaviPCMeshFittingViewerWidget(QDialog):
                                                              renderArgs=self._landmarkRenderArgs
                                                              )
                                     )
-
 
     def _setupGui(self):
         for m in self._distModes:
@@ -186,7 +187,7 @@ class MayaviPCMeshFittingViewerWidget(QDialog):
         self._ui.tableWidget.setEditTriggers(QAbstractItemView.NoEditTriggers)
         self._ui.tableWidget.setSelectionBehavior(QAbstractItemView.SelectRows)
         self._ui.tableWidget.setSelectionMode(QAbstractItemView.SingleSelection)
-        
+
         self._addObjectToTable(0, 'data', self._objects.getObject('data'))
         self._addObjectToTable(1, 'GF Unfitted', self._objects.getObject('GF Unfitted'))
         self._addObjectToTable(2, 'GF Fitted', self._objects.getObject('GF Fitted'), checked=False)
@@ -197,7 +198,7 @@ class MayaviPCMeshFittingViewerWidget(QDialog):
                 r += 1
 
         self._ui.tableWidget.resizeColumnToContents(self.objectTableHeaderColumns['visible'])
-        
+
     def _addObjectToTable(self, row, name, obj, checked=True):
         typeName = obj.typeName
         # print typeName
@@ -212,7 +213,8 @@ class MayaviPCMeshFittingViewerWidget(QDialog):
 
     def _tableItemClicked(self):
         selectedRow = self._ui.tableWidget.currentRow()
-        self.selectedObjectName = self._ui.tableWidget.item(selectedRow, self.objectTableHeaderColumns['visible']).text()
+        self.selectedObjectName = self._ui.tableWidget.item(selectedRow,
+                                                            self.objectTableHeaderColumns['visible']).text()
         # self._populateScalarsDropDown(self.selectedObjectName)
         # print selectedRow
         # print self.selectedObjectName
@@ -220,10 +222,10 @@ class MayaviPCMeshFittingViewerWidget(QDialog):
     def _visibleBoxChanged(self, tableItem):
 
         # checked changed item is actually the checkbox
-        if tableItem.column()==self.objectTableHeaderColumns['visible']:
+        if tableItem.column() == self.objectTableHeaderColumns['visible']:
             # get visible status
             name = tableItem.text()
-            visible = tableItem.checkState().name=='Checked'
+            visible = tableItem.checkState().name == 'Checked'
 
             # print 'visibleboxchanged name', name
             # print 'visibleboxchanged visible', visible
@@ -335,7 +337,7 @@ class MayaviPCMeshFittingViewerWidget(QDialog):
         for r in range(self._ui.tableWidget.rowCount()):
             tableItem = self._ui.tableWidget.item(r, self.objectTableHeaderColumns['visible'])
             name = tableItem.text()
-            visible = tableItem.checkState().name=='Checked'
+            visible = tableItem.checkState().name == 'Checked'
             obj = self._objects.getObject(name)
             # print obj.name
             if obj.sceneObject:
@@ -349,9 +351,9 @@ class MayaviPCMeshFittingViewerWidget(QDialog):
         filename = self._ui.screenshotFilenameLineEdit.text()
         width = int(self._ui.screenshotPixelXLineEdit.text())
         height = int(self._ui.screenshotPixelYLineEdit.text())
-        self._scene.mlab.savefig( filename, size=( width, height ) )
+        self._scene.mlab.savefig(filename, size=(width, height))
 
-    #================================================================#
+    # ================================================================#
     @on_trait_change('scene.activated')
     def testPlot(self):
         # This function is called when the view is opened. We don't
@@ -362,7 +364,5 @@ class MayaviPCMeshFittingViewerWidget(QDialog):
         # We can do normal mlab calls on the embedded scene.
         self._scene.mlab.test_points3d()
 
-
     # def _saveImage_fired( self ):
     #     self.scene.mlab.savefig( str(self.saveImageFilename), size=( int(self.saveImageWidth), int(self.saveImageLength) ) )
-        
