@@ -12,7 +12,7 @@ from PySide2.QtCore import *
 from PySide2.QtGui import *
 from PySide2.QtWidgets import *
 
-from gias2.mappluginutils.mayaviviewer.mayaviscenewidget import MayaviSceneWidget
+from gias3.mapclientpluginutilities.viewers.mayaviscenewidget import MayaviSceneWidget
 
 
 class Ui_Dialog(object):
@@ -67,7 +67,7 @@ class Ui_Dialog(object):
         self.toolBox.setObjectName(u"toolBox")
         self.page_fitting = QWidget()
         self.page_fitting.setObjectName(u"page_fitting")
-        self.page_fitting.setGeometry(QRect(0, 0, 307, 529))
+        self.page_fitting.setGeometry(QRect(0, 0, 332, 507))
         self.verticalLayout = QVBoxLayout(self.page_fitting)
         self.verticalLayout.setObjectName(u"verticalLayout")
         self.groupBox = QGroupBox(self.page_fitting)
@@ -240,7 +240,7 @@ class Ui_Dialog(object):
         self.toolBox.addItem(self.page_fitting, u"Fitting")
         self.Screenshot = QWidget()
         self.Screenshot.setObjectName(u"Screenshot")
-        self.Screenshot.setGeometry(QRect(0, 0, 191, 143))
+        self.Screenshot.setGeometry(QRect(0, 0, 159, 119))
         self.formLayout = QFormLayout(self.Screenshot)
         self.formLayout.setObjectName(u"formLayout")
         self.pixelsXLabel = QLabel(self.Screenshot)

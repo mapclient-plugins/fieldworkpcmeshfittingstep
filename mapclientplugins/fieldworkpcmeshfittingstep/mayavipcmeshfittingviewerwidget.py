@@ -30,9 +30,8 @@ from mapclientplugins.fieldworkpcmeshfittingstep.ui_mayavifittingviewerwidget im
 from traits.api import HasTraits, Instance, on_trait_change, \
     Int, Dict
 
-from gias2.mappluginutils.mayaviviewer import MayaviViewerObjectsContainer, \
-    MayaviViewerDataPoints, MayaviViewerFieldworkModel, MayaviViewerLandmark, \
-    colours
+from gias3.mapclientpluginutilities.viewers import MayaviViewerObjectsContainer, MayaviViewerFieldworkModel, MayaviViewerLandmark, colours
+from gias3.mapclientpluginutilities.viewers.mayaviviewerdatapoints import MayaviViewerDataPoints
 
 import copy
 
@@ -129,21 +128,21 @@ class MayaviPCMeshFittingViewerWidget(QDialog):
         self._objects.addObject('data',
                                 MayaviViewerDataPoints('data',
                                                        self._data,
-                                                       renderArgs=self._dataRenderArgs))
+                                                       render_args=self._dataRenderArgs))
         self._objects.addObject('GF Unfitted',
                                 MayaviViewerFieldworkModel('GF Unfitted',
                                                            self._GFUnfitted,
                                                            self._GFD,
-                                                           renderArgs=self._GFUnfittedRenderArgs))
+                                                           render_args=self._GFUnfittedRenderArgs))
         self._objects.addObject('GF Fitted',
                                 MayaviViewerFieldworkModel('GF Fitted',
                                                            self._GFFitted,
                                                            self._GFD,
-                                                           renderArgs=self._GFFittedRenderArgs))
+                                                           render_args=self._GFFittedRenderArgs))
         for ln in self._landmarkNames:
             self._objects.addObject(ln, MayaviViewerLandmark(ln,
                                                              self._landmarks[ln],
-                                                             renderArgs=self._landmarkRenderArgs
+                                                             render_args=self._landmarkRenderArgs
                                                              )
                                     )
 

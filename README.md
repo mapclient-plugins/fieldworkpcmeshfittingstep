@@ -6,21 +6,24 @@ The mesh is translated, rotated, and deformed according to the principal compone
 
 Requires
 --------
-- GIAS2 : https://bitbucket.org/jangle/gias2
+- GIAS3 - Learning: https://github.com/musculoskeletal/gias3.learning
+- GIAS3 - Fieldwork: https://github.com/musculoskeletal/gias3.fieldwork
+- GIAS3 - Musculoskeletal: https://github.com/musculoskeletal/gias3.musculoskeletal
+- GIAS3 - MAP Client Plugin Utilities: https://github.com/musculoskeletal/gias3.mapclientpluginutilities
 
 Inputs
 ------
 - **pointcloud** [nx3 NumPy Array] : The target point cloud.
-- **fieldworkmodel** [GIAS2 GeometricField instance] : The source Fieldwork mesh to be registered.
-- **principalcomponents** [GIAS2 PrincipalComponents instance] : An instance of the GIAS2 PrincipalComponents class. The object contains the population mean, principal components, and eigenvalues. It is the shape model used to deform the Fieldwork mesh.
-- **geometrictransform** [GIAS2 Transformation Instance][Optional] : An optional initial rigid-body transform to apply to the Fieldwork mesh before registration.
+- **fieldworkmodel** [GIAS3 GeometricField instance] : The source Fieldwork mesh to be registered.
+- **principalcomponents** [GIAS3 PrincipalComponents instance] : An instance of the GIAS3 PrincipalComponents class. The object contains the population mean, principal components, and eigenvalues. It is the shape model used to deform the Fieldwork mesh.
+- **geometrictransform** [GIAS3 Transformation Instance][Optional] : An optional initial rigid-body transform to apply to the Fieldwork mesh before registration.
 - **array1d** [1-D NumPy Array] : An array of weights for each target point.
 - **landmarks** [dict][Optional] : An optional dictionary of landmark names mapping to coordinates. These landmarks can be used as targets in the registration with the target pointcloud.
 
 Outputs
 -------
-- **fieldworkmodel** [GIAS2 GeometricField instance] : The registered Fieldwork mesh.
-- **geometrictransform** [GIAS2 Transformation Instance] : The final registering transformation from the source mesh to the target pointcloud. The object contains the rigid-body translation and rotations, plus the principal components scores used.
+- **fieldworkmodel** [GIAS3 GeometricField instance] : The registered Fieldwork mesh.
+- **geometrictransform** [GIAS3 Transformation Instance] : The final registering transformation from the source mesh to the target pointcloud. The object contains the rigid-body translation and rotations, plus the principal components scores used.
 - **float** [float] : The registration error in terms of the root-mean-squared Euclidean distance between the target points and the registered mesh.
 - **array1d** [1-D NumPy Array] : An array of the Euclidean distance between each target point and its closest point on the registered mesh.
 

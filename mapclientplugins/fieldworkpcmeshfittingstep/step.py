@@ -11,10 +11,10 @@ from mapclientplugins.fieldworkpcmeshfittingstep.mayavipcmeshfittingviewerwidget
 
 import copy
 import numpy as np
-from gias2.fieldwork.field import geometric_field_fitter as GFF
-from gias2.learning import PCA_fitting
-from gias2.musculoskeletal import fw_model_landmarks
-from gias2.mappluginutils.datatypes import transformations
+from gias3.fieldwork.field import geometric_field_fitter as GFF
+from gias3.learning import PCA_fitting
+from gias3.musculoskeletal import fw_model_landmarks
+from gias3.mapclientpluginutilities.datatypes import transformations
 
 
 class FieldworkPCMeshFittingStep(WorkflowStepMountPoint):
@@ -56,7 +56,7 @@ class FieldworkPCMeshFittingStep(WorkflowStepMountPoint):
                       'http://physiomeproject.org/workflow/1.0/rdf-schema#uses',
                       'ju#fieldworkmodel'))
 
-        # principal components (gias.learning.PCA.PrincipalComponents)
+        # principal components (gias3.learning.PCA.PrincipalComponents)
         self.addPort(('http://physiomeproject.org/workflow/1.0/rdf-schema#port',
                       'http://physiomeproject.org/workflow/1.0/rdf-schema#uses',
                       'ju#principalcomponents'))
@@ -160,10 +160,10 @@ class FieldworkPCMeshFittingStep(WorkflowStepMountPoint):
         return an obj with weighting, and one without for rmse calculation
         """
         dataObj = gObjMaker(self._GF, self._data, GD, self._dataWeights,
-                            nClosestPoints=nClosestPoints)
+                            n_closest_points=nClosestPoints)
 
         dataObjNoWeights = gObjMaker(self._GF, self._data, GD,
-                                     nClosestPoints=nClosestPoints)
+                                     n_closest_points=nClosestPoints)
 
         # handle landmarks
         ldMap, ldWeights = self._parseLandmarkConfig()
@@ -244,12 +244,12 @@ class FieldworkPCMeshFittingStep(WorkflowStepMountPoint):
         # fit
         if fitScale == 'True':
             GXOpt, GPOpt = PCFitter.rigidScaleModeNFit(obj, modes=fitModes[1:],
-                                                       x0=x0, mWeight=mWeight,
+                                                       x0=x0, m_weight=mWeight,
                                                        maxfev=maxfev,
                                                        )
         else:
             GXOpt, GPOpt = PCFitter.rigidModeNFit(obj, modes=fitModes[1:],
-                                                  x0=x0, mWeight=mWeight,
+                                                  x0=x0, m_weight=mWeight,
                                                   maxfev=maxfev,
                                                   )
         self._GF.set_field_parameters(GPOpt.copy().reshape((3, -1, 1)))
@@ -283,8 +283,8 @@ class FieldworkPCMeshFittingStep(WorkflowStepMountPoint):
         scale = (self._config['Fit Scale'] == 'True')
 
         xOpt, nodesOpt = PCA_fitting.fitSSMTo3DPoints(
-            targetPoints, self._pc, pcModes, mWeight=mWeight,
-            doScale=scale, verbose=False,
+            targetPoints, self._pc, pcModes, m_weight=mWeight,
+            do_scale=scale, verbose=False,
         )[:2]
 
         self._x0FromInputModel = xOpt
