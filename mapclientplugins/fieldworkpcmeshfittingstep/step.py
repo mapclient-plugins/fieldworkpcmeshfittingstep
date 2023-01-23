@@ -3,7 +3,7 @@ MAP Client Plugin Step
 '''
 import json
 
-from PySide2 import QtGui
+from PySide6 import QtGui
 
 from mapclient.mountpoints.workflowstep import WorkflowStepMountPoint
 from mapclientplugins.fieldworkpcmeshfittingstep.configuredialog import ConfigureDialog
